@@ -1,0 +1,16 @@
+<%= form_with model: director do |form| %>
+    <div>
+      <%= form.label :first_name %>
+      <%= form.text_field :first_name %>
+
+      <%= form.label :last_name %>
+      <%= form.text_field :last_name %>
+
+      <%= form.label :birth_date %>
+      <%= form.date_field :birth_date %>
+    </div>
+
+    <div>
+      <%= form.submit %>
+    </div>
+<% end %>

@@ -1,0 +1,11 @@
+<h1>Directors</h1>
+
+<%= link_to "New director", new_director_path %>
+
+<div id="directors">
+    <% @directors.each do |director| %>
+        <div>
+            <%= link_to "#{director.first_name} #{director.last_name}", director %>
+        </div>
+    <% end %>
+</div>
