@@ -1,0 +1,6 @@
+<h1><%= @director.first_name %> <%= @director.last_name %></h1>
+
+<h1>Birth date</h1><%= @director.birth_date %>
+
+<%= link_to "Back", directors_path %>
+<%= link_to "Edit", edit_director_path(@director) %>
