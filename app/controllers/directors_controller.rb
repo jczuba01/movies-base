@@ -36,11 +36,11 @@ end
     @director.destroy
     redirect_to directors_path
   end
-  
+
   private
     def set_director
       @director = Director.find(params[:id])
-    end    
+    end
 
     def director_params
       params.require(:director).permit(:first_name, :last_name, :birth_date)
