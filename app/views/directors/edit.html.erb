@@ -1,8 +1,10 @@
-<h1>Edit director</h1>
+<div class="container mt-4">
+  <h1 class="mb-4">Edit Director</h1>
 
-<%= render "form", director: @director %>
-<%= link_to "Cancel", @director %>
-<%= button_to "Delete", @director, 
-  method: :delete, 
-  class: "btn btn-danger d-inline",
-  data: { turbo_confirm: "Are you sure?" } %>
+  <%= render "form", director: @director %>
+
+  <div class="d-flex gap-2 mt-3">
+    <%= link_to "Cancel", @director, class: "btn btn-secondary" %>
+    <%= button_to "Delete", @director, method: :delete, class: "btn btn-danger", data: { turbo_confirm: "Are you sure?" } %>
+  </div>
+</div>

@@ -1,6 +1,11 @@
-<h1><%= @director.first_name %> <%= @director.last_name %></h1>
+<div class="container mt-4">
+  <h1><%= @director.first_name %> <%= @director.last_name %></h1>
 
-<h1>Birth date</h1><%= @director.birth_date %>
+  <h2 class="mt-3">Birth Date</h2>
+  <p><%= @director.birth_date %></p>
 
-<%= link_to "Back", directors_path %>
-<%= link_to "Edit", edit_director_path(@director) %>
+  <div class="d-flex gap-2 mt-3">
+    <%= link_to "Back", directors_path, class: "btn btn-secondary" %>
+    <%= link_to "Edit", edit_director_path(@director), class: "btn btn-primary" %>
+  </div>
+</div>

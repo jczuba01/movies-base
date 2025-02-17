@@ -1,11 +1,11 @@
-<h1>Genres</h1>
+<div class="container mt-4">
+  <h1>Genres</h1>
 
-<%= link_to "New genre", new_genre_path %>
+  <%= link_to "New Genre", new_genre_path, class: "btn btn-success mb-3" %>
 
-<div id="genres">
+  <div id="genres" class="list-group">
     <% @genres.each do |genre| %>
-        <div>
-            <%= link_to genre.name, genre %>
-        </div>
+      <%= link_to genre.name, genre, class: "list-group-item list-group-item-action" %>
     <% end %>
+  </div>
 </div>
