@@ -1,9 +1,36 @@
-<h1>Movies</h1>
+<div class="container mt-4">
+  <h1>Movies</h1>
 
-<%= link_to "New Movie", new_movie_path %>
+  <%= link_to "New Movie", new_movie_path, class: "btn btn-primary mb-3" %>
 
-<div id="movies">
-  <% @movies.each do |movie| %>
-    <%= link_to movie.title, movie %>
-  <% end %>
+  <table class="table table-striped table-bordered">
+    <thead class="table-dark">
+      <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Genre</th>
+        <th>Duration in Minutes</th>
+        <th>Director</th>
+        <th>Origin Country</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @movies.each do |movie| %>
+        <tr>
+          <td><%= movie.id %></td>
+          <td><%= link_to movie.title, movie %></td>
+          <td><%= movie.description %></td>
+          <td><%= link_to movie.genre.name, movie.genre %></td> <!-- Assuming Genre relation -->
+          <td><%= movie.duration_minutes %></td>
+          <td><%= link_to "#{movie.director.first_name} #{movie.director.last_name}", movie.director %></td> <!-- Assuming Director relation -->
+          <td><%= movie.origin_country %></td>
+          <td>
+            <%= link_to "Edit", edit_movie_path(movie), class: "btn btn-warning btn-sm" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
 </div>

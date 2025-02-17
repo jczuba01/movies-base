@@ -1,8 +1,10 @@
-<h1>Edit Movie</h1>
+<div class="container mt-4">
+  <h1>Edit Movie</h1>
 
-<%= render "form", movie: @movie %>
+  <%= render "form", movie: @movie %>
 
-<div>
-  <%= link_to "Cancel", @movie %>
-  <%= button_to "Delete", @movie, method: :delete %>
+  <div class="d-flex mt-3">
+    <%= link_to "Cancel", @movie, class: "btn btn-secondary me-2" %>
+    <%= button_to "Delete", @movie, method: :delete, class: "btn btn-danger", data: { confirm: "Are you sure?" } %>
+  </div>
 </div>
