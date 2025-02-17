@@ -1,0 +1,35 @@
+<%= form_with model: movie do |form| %>
+    <div>
+      <%= form.label :title %>
+      <%= form.text_field :title %>
+    </div>
+  
+    <div>
+      <%= form.label :description %>
+      <%= form.text_area :description %>
+    </div>
+  
+    <div>
+      <%= form.label :duration_minutes %>
+      <%= form.number_field :duration_minutes %>
+    </div>
+  
+    <div>
+      <%= form.label :origin_country %>
+      <%= form.text_field :origin_country %>
+    </div>
+  
+    <div>
+      <%= form.label :genre_id, "Genre" %>
+      <%= form.collection_select :genre_id, Genre.all, :id, :name %>
+    </div>
+  
+    <div>
+    <%= form.label :director_id, "Director" %>
+    <%= form.collection_select :director_id, Director.all, :id, ->(director) { "#{director.first_name} #{director.last_name}" } %>
+    </div>
+  
+    <div>
+      <%= form.submit %>
+    </div>
+  <% end %>

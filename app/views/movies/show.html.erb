@@ -1,0 +1,14 @@
+<h1><%= @movie.title %></h1>
+
+<div>
+  <p><strong>Description:</strong> <%= @movie.description %></p>
+  <p><strong>Duration:</strong> <%= @movie.duration_minutes %> minutes</p>
+  <p><strong>Country:</strong> <%= @movie.origin_country %></p>
+  <p><strong>Genre:</strong> <%= link_to @movie.genre.name, @movie.genre %></p>
+  <p><strong>Director:</strong> <%= link_to "#{@movie.director.first_name} #{@movie.director.last_name}", @movie.director %></p>
+</div>
+
+<div>
+  <%= link_to "Back", movies_path %>
+  <%= link_to "Edit", edit_movie_path(@movie) %>
+</div>
