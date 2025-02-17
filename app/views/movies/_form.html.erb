@@ -21,12 +21,12 @@
 
   <div class="mb-3">
     <%= form.label :genre_id, "Genre", class: "form-label" %>
-    <%= form.collection_select :genre_id, Genre.all, :id, :name, {}, { class: "form-select" } %>
+    <%= form.collection_select :genre_id, current_user.genres, :id, :name, {}, { class: "form-select" } %>
   </div>
 
   <div class="mb-3">
     <%= form.label :director_id, "Director", class: "form-label" %>
-    <%= form.collection_select :director_id, Director.all, :id, ->(d) { "#{d.first_name} #{d.last_name}" }, {}, { class: "form-select" } %>
+    <%= form.collection_select :director_id, current_user.directors, :id, ->(d) { "#{d.first_name} #{d.last_name}" }, {}, { class: "form-select" } %>
   </div>
 
   <div class="mb-3">

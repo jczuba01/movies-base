@@ -1,28 +1,65 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Movies Base" %></title>
+    <title>Movies Base</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-
-    <%= yield :head %>
-
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
-
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
-
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
+    
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet">
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+
+    <style>
+    .alert {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      max-width: 300px;
+      z-index: 1050;
+    }
+  </style>
   </head>
 
   <body>
-    <%= yield %>
-  </body>
+    <% if user_signed_in? %>
+      <div class="position-fixed top-0 end-0 p-3">
+        <%= button_to "Logout", destroy_user_session_path, method: :delete, class: "btn btn-danger" %>
+      </div>
+    <% end %>
+
+    <div class="container mt-4">
+      <% if notice %>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          <%= notice %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <% end %>
+
+      <% if alert %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <%= alert %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <% end %>
+
+      <%= yield %>
+    </div>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var alerts = document.querySelectorAll('.alert');
+      alerts.forEach(function(alert) {
+        var closeButton = alert.querySelector('.btn-close');
+        if (closeButton) {
+          closeButton.addEventListener('click', function() {
+            alert.remove();
+          });
+        }
+      });
+    });
+  </script>
+  
+    </body>
 </html>
