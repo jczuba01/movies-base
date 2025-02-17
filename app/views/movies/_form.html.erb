@@ -30,6 +30,6 @@
   </div>
 
   <div class="mb-3">
-    <%= form.submit "Add Movie", class: "btn btn-primary" %>
+    <%= form.submit @movie.new_record? ? "Add Movie" : "Save Movie", class: "btn btn-primary" %>
   </div>
 <% end %>
