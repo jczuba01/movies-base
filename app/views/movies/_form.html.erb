@@ -1,35 +1,35 @@
-<%= form_with model: movie do |form| %>
-    <div>
-      <%= form.label :title %>
-      <%= form.text_field :title %>
-    </div>
-  
-    <div>
-      <%= form.label :description %>
-      <%= form.text_area :description %>
-    </div>
-  
-    <div>
-      <%= form.label :duration_minutes %>
-      <%= form.number_field :duration_minutes %>
-    </div>
-  
-    <div>
-      <%= form.label :origin_country %>
-      <%= form.text_field :origin_country %>
-    </div>
-  
-    <div>
-      <%= form.label :genre_id, "Genre" %>
-      <%= form.collection_select :genre_id, Genre.all, :id, :name %>
-    </div>
-  
-    <div>
-    <%= form.label :director_id, "Director" %>
-    <%= form.collection_select :director_id, Director.all, :id, ->(director) { "#{director.first_name} #{director.last_name}" } %>
-    </div>
-  
-    <div>
-      <%= form.submit %>
-    </div>
-  <% end %>
+<%= form_with model: movie, html: { class: "container mt-4" } do |form| %>
+  <div class="mb-3">
+    <%= form.label :title, class: "form-label" %>
+    <%= form.text_field :title, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :description, class: "form-label" %>
+    <%= form.text_area :description, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :duration_minutes, class: "form-label" %>
+    <%= form.number_field :duration_minutes, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :origin_country, class: "form-label" %>
+    <%= form.text_field :origin_country, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :genre_id, "Genre", class: "form-label" %>
+    <%= form.collection_select :genre_id, Genre.all, :id, :name, {}, { class: "form-select" } %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :director_id, "Director", class: "form-label" %>
+    <%= form.collection_select :director_id, Director.all, :id, ->(d) { "#{d.first_name} #{d.last_name}" }, {}, { class: "form-select" } %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.submit "Add Movie", class: "btn btn-primary" %>
+  </div>
+<% end %>

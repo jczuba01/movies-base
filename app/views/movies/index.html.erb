@@ -1,9 +1,13 @@
-<h1>Movies</h1>
+<div class="container mt-4">
+  <h1>Movies</h1>
 
-<%= link_to "New Movie", new_movie_path %>
+  <%= link_to "New Movie", new_movie_path, class: "btn btn-success mb-3" %>
 
-<div id="movies">
-  <% @movies.each do |movie| %>
-    <%= link_to movie.title, movie %>
-  <% end %>
-</div>
+  <ul class="list-group">
+    <% @movies.each do |movie| %>
+      <li class="list-group-item">
+        <%= link_to movie.title, movie, class: "text-decoration-none" %>
+      </li>
+    <% end %>
+  </ul>
+</div
