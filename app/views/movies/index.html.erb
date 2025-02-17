@@ -8,8 +8,11 @@
       <tr>
         <th>ID</th>
         <th>Title</th>
-        <th>Director</th>
+        <th>Description</th>
         <th>Genre</th>
+        <th>Duration in Minutes</th>
+        <th>Director</th>
+        <th>Origin Country</th>
         <th>Actions</th>
       </tr>
     </thead>
@@ -18,8 +21,11 @@
         <tr>
           <td><%= movie.id %></td>
           <td><%= link_to movie.title, movie %></td>
-          <td><%= link_to "#{movie.director.first_name} #{movie.director.last_name}", movie.director %></td>
-          <td><%= link_to movie.genre.name, movie.genre %></td>
+          <td><%= movie.description %></td>
+          <td><%= link_to movie.genre.name, movie.genre %></td> <!-- Assuming Genre relation -->
+          <td><%= movie.duration_minutes %></td>
+          <td><%= link_to "#{movie.director.first_name} #{movie.director.last_name}", movie.director %></td> <!-- Assuming Director relation -->
+          <td><%= movie.origin_country %></td>
           <td>
             <%= link_to "Edit", edit_movie_path(movie), class: "btn btn-warning btn-sm" %>
           </td>
