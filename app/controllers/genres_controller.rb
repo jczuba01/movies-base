@@ -1,25 +1,26 @@
 class GenresController < ApplicationController
-  before_action :set_genre, only: %i[ show edit update destroy ]
+  before_action :authenticate_user!
+  before_action :set_genre, only: [:show, :edit, :update, :destroy]
 
   def index
-    @genres = Genre.all
+    @genres = current_user.genres
   end
 
   def show
   end
 
   def new
-    @genre = Genre.new
+    @genre = current_user.genres.build
   end
 
   def create
-    @genre = Genre.new(genre_params)
-  if @genre.save
-    redirect_to @genre
-  else
-    render :new, status: :unprocessable_entity
+    @genre = current_user.genres.build(genre_params)
+    if @genre.save
+      redirect_to @genre
+    else
+      render :new, status: :unprocessable_entity
+    end
   end
-end
 
   def edit
   end
@@ -39,7 +40,7 @@ end
 
   private
     def set_genre
-      @genre = Genre.find(params[:id])
+      @genre = current_user.genres.find(params[:id])
     end
 
     def genre_params

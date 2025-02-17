@@ -1,25 +1,26 @@
 class DirectorsController < ApplicationController
-  before_action :set_director, only: %i[ show edit update destroy ]
+  before_action :authenticate_user!
+  before_action :set_director, only: [:show, :edit, :update, :destroy]
 
   def index
-    @directors = Director.all
+    @directors = current_user.directors
   end
 
   def show
   end
 
   def new
-    @director = Director.new
+    @director = current_user.directors.build
   end
 
   def create
-    @director = Director.new(director_params)
+    @director = current_user.directors.build(director_params)
     if @director.save
       redirect_to @director
     else
       render :new, status: :unprocessable_entity
     end
-end
+  end
 
   def edit
   end
@@ -39,7 +40,7 @@ end
 
   private
     def set_director
-      @director = Director.find(params[:id])
+      @director = current_user.directors.find(params[:id])
     end
 
     def director_params
