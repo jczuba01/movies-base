@@ -47,6 +47,7 @@ class MoviesController < ApplicationController
       if @review.save
         redirect_to @movie, notice: 'Review was successfully created.'
       else
+        @reviews = @movie.reviews
         render :show
       end
     end
