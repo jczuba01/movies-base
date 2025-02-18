@@ -7,7 +7,11 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
   resources :directors
   resources :genres
-  resources :movies
+  resources :movies do
+    member do
+      post 'create_review'
+    end
+  end
 
   root "movies#index"
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
