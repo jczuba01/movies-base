@@ -8,9 +8,7 @@ Rails.application.routes.draw do
   resources :directors
   resources :genres
   resources :movies do
-    member do
-      post 'create_review'
-    end
+    resources :reviews, only: [:create, :update, :destroy]
   end
 
   root "movies#index"

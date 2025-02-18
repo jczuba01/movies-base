@@ -11,7 +11,11 @@
         <div class="col-md-6">
           <p><strong>Genre:</strong> <%= link_to @movie.genre.name, @movie.genre, class: "text-decoration-none" %></p>
           <p><strong>Director:</strong> <%= link_to "#{@movie.director.first_name} #{@movie.director.last_name}", @movie.director, class: "text-decoration-none" %></p>
+          </div>
+        <div class="col-md-6">
+        <p><strong>Średnia ocen:</strong> <%= @movie.average_rating %></p>
         </div>
+
       </div>
       <div class="mt-4">
         <%= link_to "Back", movies_path, class: "btn btn-secondary mr-2" %>
@@ -36,7 +40,7 @@
     <% end %>
 
     <h4 class="mt-4">Add a Review</h4>
-    <%= form_with(model: [@movie, Review.new], url: create_review_movie_path(@movie), local: true) do |form| %>
+    <%= form_with(model: [@movie, Review.new], local: true) do |form| %>
       <div class="form-group">
         <%= form.label :rating, "Rating" %>
         <%= form.select :rating, options_for_select(1..5), {}, class: 'form-control' %>
