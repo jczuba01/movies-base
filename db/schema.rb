@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_02_18_112823) do
+ActiveRecord::Schema[8.0].define(version: 2025_02_18_130632) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -37,6 +37,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_02_18_112823) do
     t.datetime "updated_at", null: false
     t.integer "genre_id", null: false
     t.integer "director_id", null: false
+    t.float "average_rating"
     t.index ["director_id"], name: "index_movies_on_director_id"
     t.index ["genre_id"], name: "index_movies_on_genre_id"
   end

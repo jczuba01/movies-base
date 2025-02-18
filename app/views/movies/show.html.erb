@@ -11,7 +11,11 @@
         <div class="col-md-6">
           <p><strong>Genre:</strong> <%= link_to @movie.genre.name, @movie.genre, class: "text-decoration-none" %></p>
           <p><strong>Director:</strong> <%= link_to "#{@movie.director.first_name} #{@movie.director.last_name}", @movie.director, class: "text-decoration-none" %></p>
+          </div>
+        <div class="col-md-6">
+        <p><strong>Średnia ocen:</strong> <%= @movie.reviews.average(:rating).to_f.round(2) %>/5</p>
         </div>
+
       </div>
       <div class="mt-4">
         <%= link_to "Back", movies_path, class: "btn btn-secondary mr-2" %>
