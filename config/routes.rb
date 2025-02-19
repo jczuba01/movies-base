@@ -8,7 +8,7 @@ Rails.application.routes.draw do
   resources :directors
   resources :genres
   resources :movies do
-    resources :reviews, only: [:create, :update, :destroy]
+    resources :reviews, only: [ :create, :update, :destroy ]
   end
 
   root "movies#index"

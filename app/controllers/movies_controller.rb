@@ -43,9 +43,9 @@ class MoviesController < ApplicationController
       @movie = Movie.find(params[:id])
       @review = @movie.reviews.new(review_params)
       @review.user = current_user
-    
+
       if @review.save
-        redirect_to @movie, notice: 'Review was successfully created.'
+        redirect_to @movie, notice: "Review was successfully created."
       else
         @reviews = @movie.reviews
         render :show
@@ -60,7 +60,7 @@ class MoviesController < ApplicationController
       def movie_params
         params.require(:movie).permit(:title, :description, :duration_minutes, :origin_country, :genre_id, :director_id, :cover)
       end
-      
+
       def review_params
         params.require(:review).permit(:rating, :comment)
       end
