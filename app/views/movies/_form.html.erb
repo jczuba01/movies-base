@@ -1,4 +1,15 @@
 <%= form_with model: movie, html: { class: "container mt-4" } do |form| %>
+  <% if movie.errors.any? %>
+    <div class="alert alert-danger">
+      <h2><%= pluralize(movie.errors.count, "error") %> prohibited this movie from being saved:</h2>
+      <ul>
+        <% movie.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
   <div class="mb-3">
     <%= form.label :title, class: "form-label" %>
     <%= form.text_field :title, class: "form-control" %>
@@ -27,6 +38,11 @@
   <div class="mb-3">
     <%= form.label :director_id, "Director", class: "form-label" %>
     <%= form.collection_select :director_id, Director.all, :id, ->(d) { "#{d.first_name} #{d.last_name}" }, {}, { class: "form-select" } %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :cover %>
+    <%= form.file_field :cover %>
   </div>
 
   <div class="mb-3">
