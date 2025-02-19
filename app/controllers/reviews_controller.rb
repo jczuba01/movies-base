@@ -7,7 +7,7 @@ class ReviewsController < ApplicationController
     @review.user = current_user
     
     if @review.save
-      update_movie_rating
+      UpdateMovieRatingJob.perform_async(@movie.id)
       redirect_to @movie, notice: 'Review was successfully created.'
     else
       redirect_to @movie, alert: 'Error creating review.'
@@ -16,7 +16,7 @@ class ReviewsController < ApplicationController
 
   def update 
     if @review.update(review_params)
-      update_movie_rating
+      UpdateMovieRatingJob.perform_async(@movie.id)
       redirect_to @movie, notice: 'Review was successfully updated.'
     else
       redirect_to @movie, alert: 'Error updating review.'
@@ -25,7 +25,7 @@ class ReviewsController < ApplicationController
 
   def destroy
     if @review.destroy
-      update_movie_rating
+      UpdateMovieRatingJob.perform_async(@movie.id)
       redirect_to @movie, notice: 'Review was successfully deleted.'
     else
       redirect_to @movie, alert: 'Error deleting review.'
@@ -40,11 +40,6 @@ class ReviewsController < ApplicationController
 
   def set_review
     @review = @movie.reviews.find(params[:id])
-  end
-
-  def update_movie_rating
-    average = @movie.reviews.average(:rating).to_f.round(2)
-    @movie.update(average_rating: average)
   end
 
   def review_params
