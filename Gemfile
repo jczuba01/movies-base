@@ -69,3 +69,7 @@ end
 gem "devise", "~> 4.9"
 #Sidekiq
 gem 'sidekiq'
+#Image processing
+gem "image_processing", ">= 1.2"
+#AWS S3
+gem "aws-sdk-s3", require: false
