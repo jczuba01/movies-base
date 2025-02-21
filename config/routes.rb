@@ -13,7 +13,7 @@ Rails.application.routes.draw do
     # API routes
     namespace :api do
       namespace :v1 do
-        resources :movies, only: [:index]
+        resources :movies
       end
     end
 
