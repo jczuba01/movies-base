@@ -13,11 +13,13 @@ Rails.application.routes.draw do
     # API routes
     namespace :api do
       namespace :v1 do
-        resources :movies
+        resources :movies do
+          resources :reviews
+        end
         resources :directors
         resources :genres
-      end
     end
+  end
 
   root "movies#index"
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
