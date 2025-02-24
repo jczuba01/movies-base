@@ -17,7 +17,7 @@ class MovieSerializer
 
         }
     end
-    
+
     def to_json
         serialize.to_json
     end
