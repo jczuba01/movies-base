@@ -8,7 +8,7 @@ class Api::V1::MoviesController < ActionController::Base
     end
 
     def show
-        render json: @movie, status: :ok
+        render json: MovieSerializer.new(@movie).serialize, status: :ok
     end
 
     def create
