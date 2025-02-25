@@ -37,5 +37,7 @@ RSpec.describe Director, type: :model do
         director: director,
         genre: genre
       )
+
+      expect(director.movies.count).to eq(2)
   end
 end
