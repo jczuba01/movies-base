@@ -1,52 +1,52 @@
 require 'rails_helper'
+require 'factory_bot'
 
 RSpec.describe Movie, type: :model do
   it 'is valid with all required attributes' do
-    director = Director.create(first_name: 'David', last_name: 'Goggins')
-    genre = Genre.create(name: 'romance')
-
-    movie = Movie.new(
-      title: 'They dont know me son',
-      description: 'Navy',
-      duration_minutes: 99,
-      origin_country: 'USA',
-      director: director,
-      genre: genre
-    )
+    movie = build(:movie)
     expect(movie).to be_valid
   end
 
+  it 'is invalid without a title' do
+    movie = build(:movie, title: nil)
+    expect(movie).not_to be_valid
+    expect(movie.errors[:title]).to include("can't be blank")
+  end
+
+  it 'is valid without a description' do
+    movie = build(:movie, description: nil)
+    expect(movie).to be_valid
+  end
+
+  it 'is invalid without duration_minutes' do
+    movie = build(:movie, duration_minutes: nil)
+    expect(movie).not_to be_valid
+    expect(movie.errors[:duration_minutes]).to include("can't be blank")
+  end
+
+  it 'is valid without an origin_country' do
+    movie = build(:movie, origin_country: nil)
+    expect(movie).to be_valid
+  end
+
+  it 'is invalid without a director' do
+    movie = build(:movie, director: nil)
+    expect(movie).not_to be_valid
+    expect(movie.errors[:director]).to include("must exist")
+  end
+
+  it 'is invalid without a genre' do
+    movie = build(:movie, genre: nil)
+    expect(movie).not_to be_valid
+    expect(movie.errors[:genre]).to include("must exist")
+  end
+
   it 'can have reviews' do
-    director = Director.create(first_name: 'Quentin', last_name: 'Tarantino')
-    genre = Genre.create(name: 'crime')
-
-    movie = Movie.create(
-      title: 'Box',
-      description: 'Kox',
-      duration_minutes: 433,
-      origin_country: 'Argentina',
-      director: director,
-      genre: genre
-    )
-
-    user = User.create(
-      email: 'user@example.com',
-      password: 'password123'
-    )
-
-    Review.create(
-      rating: 5,
-      comment: 'Top!!!',
-      user: user,
-      movie: movie
-    )
-
-    Review.create(
-      rating: 1,
-      comment: 'Piece of shit',
-      user: user,
-      movie: movie
-    )
+    movie = create(:movie)
+    user = create(:user)
+    
+    create(:review, movie: movie, user: user)
+    create(:review, movie: movie, user: user)
     
     expect(movie.reviews.count).to eq(2)
   end

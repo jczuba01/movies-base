@@ -2,42 +2,34 @@ require 'rails_helper'
 
 RSpec.describe Director, type: :model do
   it 'is valid with a first_name and last_name' do
-    director = Director.new(first_name: 'Chuj', last_name: 'Muj')
+    director = build(:director)
     expect(director).to be_valid
   end
 
-  it 'is valid without a first_name' do
-    director = Director.new(first_name: nil, last_name: 'reggiN')
-    expect(director).to be_valid
+  it 'is invalid without a first_name' do
+    director = build(:director, first_name: nil)
+    expect(director).not_to be_valid
+    expect(director.errors[:first_name]).to include("can't be blank")
   end
 
-  it 'is valid without a last_name' do
-    director = Director.new(first_name: 'Nigeria', last_name: nil)
-    expect(director).to be_valid
+  it 'is invalid without a last_name' do
+    director = build(:director, last_name: nil)
+    expect(director).not_to be_valid
+    expect(director.errors[:last_name]).to include("can't be blank")
   end
 
+  it 'is valid without a birth_date' do
+    director = build(:director, birth_date: nil)
+    expect(director).to be_valid
+  end
+  
   it 'can have many movies' do
-    director = Director.create(first_name: 'Biały', last_name: 'Murzyn')
-    genre = Genre.create(name: 'thriller')
+    director = create(:director)
+    genre = create(:genre)
 
-      movie1 = Movie.create(
-        title: 'Africa',
-        description: 'Water problem',
-        duration_minutes: 1111,
-        origin_country: 'USA',
-        director: director,
-        genre: genre
-      )
+    create(:movie, director: director, genre: genre)
+    create(:movie, director: director, genre: genre)
 
-      movie2 = Movie.create(
-        title: 'Water',
-        description: 'black black white black black',
-        duration_minutes: 123,
-        origin_country: 'Russia',
-        director: director,
-        genre: genre
-      )
-
-      expect(director.movies.count).to eq(2)
+    expect(director.movies.count).to eq(2)
   end
 end
