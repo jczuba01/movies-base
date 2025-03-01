@@ -2,9 +2,10 @@ require 'rails_helper'
 
 RSpec.describe "Genres", type: :request do  
   before do
-    allow_any_instance_of(ApplicationController).to receive(:authenticate_user!).and_return(true)
+    sign_in user, scope: :user
   end
   
+  let(:user) { create(:user) }
   let(:valid_attributes) { attributes_for(:genre) }
   let(:invalid_attributes) { { name: "" } }
 
