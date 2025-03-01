@@ -4,7 +4,7 @@ class ReviewsController < ApplicationController
 
   def create
     @review = @movie.reviews.build(review_params)
-    @review.user = User.find(params[:review][:user_id]) if params[:review][:user_id]
+    @review.user = current_user
 
     if @review.save
       UpdateMovieRatingJob.perform_async(@movie.id)
@@ -43,6 +43,6 @@ class ReviewsController < ApplicationController
   end
 
   def review_params
-    params.require(:review).permit(:rating, :comment, :user_id)
+    params.require(:review).permit(:rating, :comment)
   end
 end
