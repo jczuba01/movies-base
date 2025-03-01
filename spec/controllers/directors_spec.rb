@@ -1,5 +1,4 @@
 require 'rails_helper'
-require 'devise'
 
 RSpec.describe "Directors", type: :request do  
   before do
