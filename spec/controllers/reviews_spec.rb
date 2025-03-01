@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ReviewsController, type: :request do
+RSpec.describe "Reviews", type: :request do
   before do
     allow_any_instance_of(ApplicationController).to receive(:authenticate_user!).and_return(true)
   end
