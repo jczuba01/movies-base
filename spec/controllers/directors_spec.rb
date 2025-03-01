@@ -1,6 +1,11 @@
 require 'rails_helper'
+require 'devise'
 
-RSpec.describe "Directors", type: :request do
+RSpec.describe "Directors", type: :request do  
+  before do
+    allow_any_instance_of(ApplicationController).to receive(:authenticate_user!).and_return(true)
+  end
+  
   let(:valid_attributes) { attributes_for(:director) }
   let(:invalid_attributes) { { first_name: "", last_name: "" } }
 

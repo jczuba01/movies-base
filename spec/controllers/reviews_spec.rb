@@ -1,10 +1,14 @@
 require 'rails_helper'
 
 RSpec.describe ReviewsController, type: :request do
+  before do
+    allow_any_instance_of(ApplicationController).to receive(:authenticate_user!).and_return(true)
+  end
+  
   let(:user) { create(:user) }
   let(:movie) { create(:movie) }
   let(:review) { create(:review, movie: movie, user: user) }
-  let(:valid_attributes) { { rating: 4, comment: "This is a test comment" } }
+  let(:valid_attributes) { { rating: 4, comment: "This is a test comment", user_id: user.id } }
   let(:invalid_attributes) { { rating: nil, comment: "" } }
 
   describe "POST /movies/:movie_id/reviews" do

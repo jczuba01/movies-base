@@ -4,12 +4,7 @@ class ReviewsController < ApplicationController
 
   def create
     @review = @movie.reviews.build(review_params)
-    
-    if Rails.env.test?
-      @review.user_id = User.first&.id || FactoryBot.create(:user).id
-    else
-      @review.user = current_user
-    end
+    @review.user = User.find(params[:review][:user_id]) if params[:review][:user_id]
 
     if @review.save
       UpdateMovieRatingJob.perform_async(@movie.id)
@@ -48,6 +43,6 @@ class ReviewsController < ApplicationController
   end
 
   def review_params
-    params.require(:review).permit(:rating, :comment)
+    params.require(:review).permit(:rating, :comment, :user_id)
   end
 end
