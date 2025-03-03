@@ -1,116 +1,115 @@
 require 'rails_helper'
 
-RSpec.describe "Movies", type: :request do
-  before do
-    sign_in user, scope: :user
-  end
-  
-  let(:user) { create(:user) }
+RSpec.describe "Api::V1::Movies", type: :request do
   let(:genre) { create(:genre) }
   let(:director) { create(:director) }
-  let(:movie) { create(:movie) }
-  let(:valid_attributes) { attributes_for(:movie).merge(genre_id: genre.id, director_id: director.id) }
-  let(:invalid_attributes) { { title: "", description: "" } }
-  let(:valid_review_attributes) { attributes_for(:review) }
-  let(:invalid_review_attributes) { { rating: nil, comment: "" } }
+  
+  let(:valid_attributes) { 
+    attributes = attributes_for(:movie)
+    attributes[:genre_id] = genre.id
+    attributes[:director_id] = director.id
+    attributes
+  }
+  let(:invalid_attributes) { 
+    attributes = attributes_for(:movie, title: nil, duration_minutes: nil)
+    attributes[:genre_id] = genre.id
+    attributes[:director_id] = director.id
+    attributes
+  }
+  let(:headers) { { "ACCEPT" => "application/json" } }
 
-  describe "GET /movies" do
-    it "returns a successful response" do
-      get movies_path
-      expect(response).to have_http_status(200)
-    end
-  end
-
-  describe "GET /movies/:id" do
-    it "returns a successful response" do
-      get movie_path(movie)
+  describe "GET /api/v1/movies" do
+    it "returns a success response" do
+      movie = create(:movie)
+      get api_v1_movies_path, headers: headers
       expect(response).to be_successful
-    end
-
-    it "includes movie reviews" do
-      review = create(:review, movie: movie, user: user)
-      get movie_path(movie)
-      expect(response.body).to include(review.comment)
+      expect(JSON.parse(response.body)).to include(JSON.parse(movie.to_json))
     end
   end
 
-  describe "GET /movies/new" do
-    it "returns a successful response" do
-      get new_movie_path
+  describe "GET /api/v1/movies/:id" do
+    it "returns a success response with serialized data" do
+      movie = create(:movie)
+      get api_v1_movie_path(movie), headers: headers
       expect(response).to be_successful
+      expect(JSON.parse(response.body)).to eq(JSON.parse(MovieSerializer.new(movie).serialize.to_json))
     end
   end
 
-  describe "GET /movies/:id/edit" do
-    it "returns a successful response" do
-      get edit_movie_path(movie)
-      expect(response).to be_successful
-    end
-  end
-
-  describe "POST /movies" do
-    context "with valid parameters" do
+  describe "POST /api/v1/movies" do
+    context "with valid params" do
       it "creates a new Movie" do
         expect {
-          post movies_path, params: { movie: valid_attributes }
+          post api_v1_movies_path, params: { movie: valid_attributes }, headers: headers
         }.to change(Movie, :count).by(1)
       end
 
-      it "redirects to the created movie" do
-        post movies_path, params: { movie: valid_attributes }
-        expect(response).to redirect_to(movie_path(Movie.last))
+      it "renders a JSON response with the new movie" do
+        post api_v1_movies_path, params: { movie: valid_attributes }, headers: headers
+        expect(response).to have_http_status(:created)
+        expect(response.content_type).to include('application/json')
+        
+        response_body = JSON.parse(response.body)
+        puts "Movie from API response: #{response_body.inspect}"
+        
+        created_movie = Movie.find(response_body["id"])
+        puts "Same movie from database: #{created_movie.inspect}"
+        
+        expect(response_body["title"]).to eq(valid_attributes[:title])
       end
     end
 
-    context "with invalid parameters" do
-      it "does not create a new Movie" do
-        expect {
-          post movies_path, params: { movie: invalid_attributes }
-        }.not_to change(Movie, :count)
-      end
-
-      it "returns an unprocessable entity status" do
-        post movies_path, params: { movie: invalid_attributes }
+    context "with invalid params" do
+      it "renders a JSON response with errors for the new movie" do
+        post api_v1_movies_path, params: { movie: invalid_attributes }, headers: headers
         expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.content_type).to include('application/json')
       end
     end
   end
 
-  describe "PATCH /movies/:id" do
-    context "with valid parameters" do
-      let(:new_attributes) { { title: "Updated Movie Title" } }
+  describe "PUT /api/v1/movies/:id" do
+    context "with valid params" do
+      let(:new_attributes) { attributes_for(:movie) }
 
       it "updates the requested movie" do
-        patch movie_path(movie), params: { movie: new_attributes }
+        movie = create(:movie)
+        put api_v1_movie_path(movie), params: { movie: new_attributes }, headers: headers
         movie.reload
-        expect(movie.title).to eq("Updated Movie Title")
+        expect(movie.title).to eq(new_attributes[:title])
+        expect(movie.description).to eq(new_attributes[:description])
       end
 
-      it "redirects to the movie" do
-        patch movie_path(movie), params: { movie: new_attributes }
-        expect(response).to redirect_to(movie_path(movie))
+      it "renders a JSON response with the movie" do
+        movie = create(:movie)
+        put api_v1_movie_path(movie), params: { movie: valid_attributes }, headers: headers
+        expect(response).to have_http_status(:ok)
+        expect(response.content_type).to include('application/json')
       end
     end
 
-    context "with invalid parameters" do
-      it "returns an unprocessable entity status" do
-        patch movie_path(movie), params: { movie: invalid_attributes }
+    context "with invalid params" do
+      it "renders a JSON response with errors for the movie" do
+        movie = create(:movie)
+        put api_v1_movie_path(movie), params: { movie: invalid_attributes }, headers: headers
         expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.content_type).to include('application/json')
       end
     end
   end
 
-  describe "DELETE /movies/:id" do
+  describe "DELETE /api/v1/movies/:id" do
     it "destroys the requested movie" do
-      movie_to_delete = create(:movie)
+      movie = create(:movie)
       expect {
-        delete movie_path(movie_to_delete)
+        delete api_v1_movie_path(movie), headers: headers
       }.to change(Movie, :count).by(-1)
     end
 
-    it "redirects to the movies list" do
-      delete movie_path(movie)
-      expect(response).to redirect_to(movies_path)
+    it "returns no content status" do
+      movie = create(:movie)
+      delete api_v1_movie_path(movie), headers: headers
+      expect(response).to have_http_status(:no_content)
     end
   end
 end

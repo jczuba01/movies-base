@@ -28,7 +28,7 @@ class Api::V1::ReviewsController < ActionController::Base
             UpdateMovieRatingJob.perform_async(@movie.id)
             render json: @review, status: :ok
         else
-            render json: { errors: @review.errors.full_messages }, status: unprocessable_entity
+            render json: { errors: @review.errors.full_messages }, status: :unprocessable_entity
         end
     end
 
