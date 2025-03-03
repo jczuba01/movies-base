@@ -18,7 +18,7 @@ RSpec.describe Genre, type: :model do
 
     create(:movie, genre: genre, director: director)
     create(:movie, genre: genre, director: director)
-    
+
     expect(genre.movies.count).to eq(2)
   end
 end

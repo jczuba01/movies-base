@@ -22,7 +22,7 @@ RSpec.describe Director, type: :model do
     director = build(:director, birth_date: nil)
     expect(director).to be_valid
   end
-  
+
   it 'can have many movies' do
     director = create(:director)
     genre = create(:genre)

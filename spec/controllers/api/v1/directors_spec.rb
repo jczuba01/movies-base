@@ -35,13 +35,13 @@ RSpec.describe "Api::V1::Directors", type: :request do
         post api_v1_directors_path, params: { director: valid_attributes }, headers: headers
         expect(response).to have_http_status(:created)
         expect(response.content_type).to include('application/json')
-        
+
         response_body = JSON.parse(response.body)
         puts "Director from API response: #{response_body.inspect}"
-        
+
         created_director = Director.find(response_body["id"])
         puts "Same director from database: #{created_director.inspect}"
-        
+
         expect(response_body["first_name"]).to eq(valid_attributes[:first_name])
       end
     end

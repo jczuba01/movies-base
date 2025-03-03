@@ -3,14 +3,14 @@ require 'rails_helper'
 RSpec.describe "Api::V1::Movies", type: :request do
   let(:genre) { create(:genre) }
   let(:director) { create(:director) }
-  
-  let(:valid_attributes) { 
+
+  let(:valid_attributes) {
     attributes = attributes_for(:movie)
     attributes[:genre_id] = genre.id
     attributes[:director_id] = director.id
     attributes
   }
-  let(:invalid_attributes) { 
+  let(:invalid_attributes) {
     attributes = attributes_for(:movie, title: nil, duration_minutes: nil)
     attributes[:genre_id] = genre.id
     attributes[:director_id] = director.id
@@ -48,13 +48,13 @@ RSpec.describe "Api::V1::Movies", type: :request do
         post api_v1_movies_path, params: { movie: valid_attributes }, headers: headers
         expect(response).to have_http_status(:created)
         expect(response.content_type).to include('application/json')
-        
+
         response_body = JSON.parse(response.body)
         puts "Movie from API response: #{response_body.inspect}"
-        
+
         created_movie = Movie.find(response_body["id"])
         puts "Same movie from database: #{created_movie.inspect}"
-        
+
         expect(response_body["title"]).to eq(valid_attributes[:title])
       end
     end

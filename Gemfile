@@ -50,13 +50,13 @@ group :development, :test do
 
   # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
   gem "brakeman", require: false
-  #Rspec
+  # Rspec
   gem "rspec-rails"
-  #Factory bot
+  # Factory bot
   gem "factory_bot_rails"
-  #Faker
+  # Faker
   gem "faker"
-  #Controller testing
+  # Controller testing
   gem "rails-controller-testing"
 end
 

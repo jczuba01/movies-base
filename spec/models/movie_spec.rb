@@ -44,10 +44,10 @@ RSpec.describe Movie, type: :model do
   it 'can have reviews' do
     movie = create(:movie)
     user = create(:user)
-    
+
     create(:review, movie: movie, user: user)
     create(:review, movie: movie, user: user)
-    
+
     expect(movie.reviews.count).to eq(2)
   end
 end
