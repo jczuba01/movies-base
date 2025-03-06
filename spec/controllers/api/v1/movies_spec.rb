@@ -50,10 +50,7 @@ RSpec.describe "Api::V1::Movies", type: :request do
         expect(response.content_type).to include('application/json')
 
         response_body = JSON.parse(response.body)
-        puts "Movie from API response: #{response_body.inspect}"
-
         created_movie = Movie.find(response_body["id"])
-        puts "Same movie from database: #{created_movie.inspect}"
 
         expect(response_body["title"]).to eq(valid_attributes[:title])
       end

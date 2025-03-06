@@ -37,10 +37,7 @@ RSpec.describe "Api::V1::Genres", type: :request do
         expect(response.content_type).to include('application/json')
 
         response_body = JSON.parse(response.body)
-        puts "Genre from API response: #{response_body.inspect}"
-
         created_genre = Genre.find(response_body["id"])
-        puts "Same genre from database: #{created_genre.inspect}"
 
         expect(response_body["name"]).to eq(valid_attributes[:name])
       end

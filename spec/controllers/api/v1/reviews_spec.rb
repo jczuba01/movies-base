@@ -50,7 +50,6 @@ RSpec.describe "Api::V1::Reviews", type: :request do
         expect(response.content_type).to include('application/json')
 
         response_body = JSON.parse(response.body)
-        puts "Review from API response: #{response_body.inspect}"
 
         expect(UpdateMovieRatingJob).to have_received(:perform_async).with(movie.id)
 
