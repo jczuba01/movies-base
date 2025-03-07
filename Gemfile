@@ -59,6 +59,8 @@ group :development, :test do
   # Controller testing
   gem "rails-controller-testing"
 end
+  # Bindingpry
+  gem "pry", "~> 0.15.0"
 
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
