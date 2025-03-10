@@ -1,156 +1,222 @@
 require 'rails_helper'
 
-RSpec.describe "Api::V1::Directors", type: :request do
-  let(:headers) { { "ACCEPT" => "application/json" } }
-
-  def valid_director_body
-    director = build(:director)
-    {
-      first_name: director.first_name,
-      last_name: director.last_name,
-      birth_date: director.birth_date
-    }
-  end
-
-  let(:invalid_director_body) do
-    {
-      first_name: nil,
-      last_name: nil,
-      birth_date: nil
-    }
-  end
-
-  def verify_director_response(response_data, director)
-    expect(response_data["id"]).to eq(director.id)
-    expect(response_data["first_name"]).to eq(director.first_name)
-    expect(response_data["last_name"]).to eq(director.last_name)
-    expect(response_data["birth_date"]).to eq(director.birth_date.as_json)
-  end
-
-  def verify_director_response_with_params(response_data, params)
-    expect(response_data["id"]).to be_present
-    expect(response_data["first_name"]).to eq(params[:first_name])
-    expect(response_data["last_name"]).to eq(params[:last_name])
-    expect(response_data["birth_date"]).to be_present
-  end
-
-  def verify_error_response
-    expect(response).to have_http_status(:unprocessable_entity)
-    expect(response.content_type).to include('application/json')
-    
-    response_data = JSON.parse(response.body)
-    expect(response_data["errors"]).to be_present
-  end
-
+RSpec.describe Api::V1::DirectorsController, type: :request do
   describe "GET /api/v1/directors" do
-    it "returns a success response with all directors" do
-      directors = create_list(:director, 3)
+    before do
+      Director.create(first_name: "Martin", last_name: "Scorsese", birth_date: "1942-11-17")
+      Director.create(first_name: "Quentin", last_name: "Tarantino", birth_date: "1963-03-27")
+    end
+
+    let(:expected_response) do
+      [
+        hash_including("first_name" => "Martin", "last_name" => "Scorsese"),
+        hash_including("first_name" => "Quentin", "last_name" => "Tarantino")
+      ]
+    end
+
+    it "returns status code 200" do
+      get "/api/v1/directors"
+      expect(response).to have_http_status(:ok)
+    end
+    
+    it "returns an array of directors" do
+      get "/api/v1/directors"
       
-      get "/api/v1/directors", headers: headers
-      
-      response_data = JSON.parse(response.body)
-      expect(response).to be_successful
-      binding.pry
-      
-      expect(response_data.length).to eq(3)
-      directors.each do |director|
-        director_in_response = response_data.find { |d| d["id"] == director.id }
-        verify_director_response(director_in_response, director)
-      end
+      json_response = JSON.parse(response.body)
+      expect(json_response).to be_an(Array)
+      expect(json_response.size).to eq(2)
+      expect(json_response).to match_array(expected_response)
     end
   end
-
+  
   describe "GET /api/v1/directors/:id" do
-    it "returns a success response" do
-      director = create(:director)
+    let!(:director) { Director.create(first_name: "Christopher", last_name: "Nolan", birth_date: "1970-07-30") }
+    
+    let(:expected_response) do
+      hash_including(
+        "first_name" => "Christopher",
+        "last_name" => "Nolan",
+        "birth_date" => "1970-07-30"
+      )
+    end
+    
+    it "returns status code 200" do
+      get "/api/v1/directors/#{director.id}"
+      expect(response).to have_http_status(:ok)
+    end
+    
+    it "returns the requested director" do
+      get "/api/v1/directors/#{director.id}"
       
-      get "/api/v1/directors/#{director.id}", headers: headers
-      
-      expect(response).to be_successful
-      verify_director_response(JSON.parse(response.body), director)
+      json_response = JSON.parse(response.body)
+      expect(json_response).to match(expected_response)
     end
   end
 
   describe "POST /api/v1/directors" do
     context "with valid params" do
-      it "creates a new Director" do
-        body = valid_director_body
-        
+      let(:valid_request_body) do
+        { 
+          director: { 
+            first_name: "Donald", 
+            last_name: "Glover", 
+            birth_date: "1983-09-25" 
+          } 
+        }
+      end
+      
+      let(:expected_response) do
+        hash_including(
+          "first_name" => "Donald",
+          "last_name" => "Glover",
+          "birth_date" => "1983-09-25"
+        )
+      end
+      
+      it "returns status code 201" do
+        post "/api/v1/directors", params: valid_request_body
+        expect(response).to have_http_status(:created)
+      end
+      
+      it "creates a new director" do
         expect {
-          post "/api/v1/directors", params: { director: body }, headers: headers
+          post "/api/v1/directors", params: valid_request_body
         }.to change(Director, :count).by(1)
       end
-
-      it "renders a JSON response with the new director" do
-        body = valid_director_body
+      
+      it "returns the created director" do
+        post "/api/v1/directors", params: valid_request_body
         
-        post "/api/v1/directors", params: { director: body }, headers: headers
-        
-        expect(response).to have_http_status(:created)
-        expect(response.content_type).to include('application/json')
-        verify_director_response_with_params(JSON.parse(response.body), body)
+        json_response = JSON.parse(response.body)
+        expect(json_response).to match(expected_response)
       end
     end
-
+    
     context "with invalid params" do
-      it "renders a JSON response with errors for the new director" do
-        post "/api/v1/directors", params: { director: invalid_director_body }, headers: headers
-        verify_error_response
+      let(:invalid_request_body) do
+        { 
+          director: { 
+            first_name: nil, 
+            last_name: "Glover", 
+            birth_date: "1983-09-25" 
+          } 
+        }
+      end
+      
+      let(:expected_error_response) do
+        hash_including("errors")
+      end
+      
+      it "returns status code 422" do
+        post "/api/v1/directors", params: invalid_request_body
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+      
+      it "does not create a new director" do
+        expect {
+          post "/api/v1/directors", params: invalid_request_body
+        }.not_to change(Director, :count)
+      end
+      
+      it "returns error messages" do
+        post "/api/v1/directors", params: invalid_request_body
+        
+        json_response = JSON.parse(response.body)
+        expect(json_response).to match(expected_error_response)
       end
     end
   end
 
   describe "PUT /api/v1/directors/:id" do
+    let!(:director) { Director.create(first_name: "Alfred", last_name: "Hitchcock", birth_date: "1899-08-13") }
+    
     context "with valid params" do
-      it "updates the requested director" do
-        director = create(:director)
-        body = valid_director_body
-        
-        put "/api/v1/directors/#{director.id}", params: { director: body }, headers: headers
+      let(:valid_request_body) do
+        { 
+          director: { 
+            first_name: "Alfred", 
+            last_name: "Hitchcock Updated", 
+            birth_date: "1899-08-13" 
+          } 
+        }
+      end
+      
+      let(:expected_response) do
+        hash_including(
+          "first_name" => "Alfred",
+          "last_name" => "Hitchcock Updated",
+          "birth_date" => "1899-08-13"
+        )
+      end
+      
+      it "returns status code 200" do
+        put "/api/v1/directors/#{director.id}", params: valid_request_body
+        expect(response).to have_http_status(:ok)
+      end
+      
+      it "updates the director" do
+        put "/api/v1/directors/#{director.id}", params: valid_request_body
         
         director.reload
-        expect(director.first_name).to eq(body[:first_name])
-        expect(director.last_name).to eq(body[:last_name])
-        expect(director.birth_date.to_s).to eq(body[:birth_date].to_s)
+        expect(director.last_name).to eq("Hitchcock Updated")
       end
-
-      it "renders a JSON response with the updated director" do
-        director = create(:director)
-        body = valid_director_body
+      
+      it "returns the updated director" do
+        put "/api/v1/directors/#{director.id}", params: valid_request_body
         
-        put "/api/v1/directors/#{director.id}", params: { director: body }, headers: headers
-        
-        expect(response).to have_http_status(:ok)
-        expect(response.content_type).to include('application/json')
-        verify_director_response_with_params(JSON.parse(response.body), body)
+        json_response = JSON.parse(response.body)
+        expect(json_response).to match(expected_response)
       end
     end
-
+    
     context "with invalid params" do
-      it "renders a JSON response with errors for the director" do
-        director = create(:director)
+      let(:invalid_request_body) do
+        { 
+          director: { 
+            first_name: nil, 
+            last_name: "Hitchcock Updated", 
+            birth_date: "1899-08-13" 
+          } 
+        }
+      end
+      
+      let(:expected_error_response) do
+        hash_including("errors")
+      end
+      
+      it "returns status code 422" do
+        put "/api/v1/directors/#{director.id}", params: invalid_request_body
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+      
+      it "does not update the director" do
+        put "/api/v1/directors/#{director.id}", params: invalid_request_body
         
-        put "/api/v1/directors/#{director.id}", params: { director: invalid_director_body }, headers: headers
-        verify_error_response
+        director.reload
+        expect(director.last_name).to eq("Hitchcock")
+      end
+      
+      it "returns error messages" do
+        put "/api/v1/directors/#{director.id}", params: invalid_request_body
+        
+        json_response = JSON.parse(response.body)
+        expect(json_response).to match(expected_error_response)
       end
     end
   end
 
   describe "DELETE /api/v1/directors/:id" do
-    it "destroys the requested director" do
-      director = create(:director)
-      
-      expect {
-        delete "/api/v1/directors/#{director.id}", headers: headers
-      }.to change(Director, :count).by(-1)
-    end
-
-    it "returns no content status" do
-      director = create(:director)
-      
-      delete "/api/v1/directors/#{director.id}", headers: headers
-      
+    let!(:director) { Director.create(first_name: "Francis Ford", last_name: "Coppola", birth_date: "1939-04-07") }
+    
+    it "returns status code 204" do
+      delete "/api/v1/directors/#{director.id}"
       expect(response).to have_http_status(:no_content)
+    end
+    
+    it "deletes the director" do
+      expect {
+        delete "/api/v1/directors/#{director.id}"
+      }.to change(Director, :count).by(-1)
     end
   end
 end
