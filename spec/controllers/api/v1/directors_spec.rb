@@ -115,11 +115,7 @@ RSpec.describe Api::V1::DirectorsController, type: :request do
           } 
         }
       end
-      
-      let(:expected_error_response) do
-        hash_including("errors")
-      end
-      
+            
       it "returns status code 422" do
         post "/api/v1/directors", params: invalid_request_body
         expect(response).to have_http_status(:unprocessable_entity)
