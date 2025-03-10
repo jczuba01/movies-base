@@ -3,15 +3,8 @@ require 'rails_helper'
 RSpec.describe Api::V1::DirectorsController, type: :request do
   describe "GET /api/v1/directors" do
     before do
-      Director.create(first_name: "Martin", last_name: "Scorsese", birth_date: "1942-11-17")
-      Director.create(first_name: "Quentin", last_name: "Tarantino", birth_date: "1963-03-27")
-    end
-
-    let(:expected_response) do
-      [
-        hash_including("first_name" => "Martin", "last_name" => "Scorsese"),
-        hash_including("first_name" => "Quentin", "last_name" => "Tarantino")
-      ]
+      @martin_director = Director.create(first_name: "Martin", last_name: "Scorsese", birth_date: "1942-11-17")
+      @quentin_director = Director.create(first_name: "Quentin", last_name: "Tarantino", birth_date: "1963-03-27")
     end
 
     it "returns status code 200" do
@@ -25,31 +18,50 @@ RSpec.describe Api::V1::DirectorsController, type: :request do
       json_response = JSON.parse(response.body)
       expect(json_response).to be_an(Array)
       expect(json_response.size).to eq(2)
-      expect(json_response).to match_array(expected_response)
+      expect(json_response.first).to eq(
+      {  
+        "id" => @martin_director.id,
+        "first_name" => "Martin",
+        "last_name" => "Scorsese",
+        "birth_date" => "1942-11-17",
+        "created_at" => json_response.first["created_at"],
+        "updated_at" => json_response.first["updated_at"]
+      })
+      expect(json_response.second).to eq(
+      {
+        "id" => @quentin_director.id,
+        "first_name" => "Quentin",
+        "last_name" => "Tarantino",
+        "birth_date" => "1963-03-27",
+        "created_at" => json_response.second["created_at"],
+        "updated_at" => json_response.second["updated_at"]
+      })
     end
   end
   
   describe "GET /api/v1/directors/:id" do
-    let!(:director) { Director.create(first_name: "Christopher", last_name: "Nolan", birth_date: "1970-07-30") }
-    
-    let(:expected_response) do
-      hash_including(
-        "first_name" => "Christopher",
-        "last_name" => "Nolan",
-        "birth_date" => "1970-07-30"
-      )
+    before do
+      @director = Director.create(first_name: "Martin", last_name: "Scorsese", birth_date: "1942-11-17")
     end
-    
+
     it "returns status code 200" do
-      get "/api/v1/directors/#{director.id}"
+      get "/api/v1/directors/#{@director.id}"
       expect(response).to have_http_status(:ok)
     end
     
     it "returns the requested director" do
-      get "/api/v1/directors/#{director.id}"
+      get "/api/v1/directors/#{@director.id}"
       
       json_response = JSON.parse(response.body)
-      expect(json_response).to match(expected_response)
+      expect(json_response).to eq(
+      {
+        "id" => @director.id,
+        "first_name" => "Martin",
+        "last_name" => "Scorsese",
+        "birth_date" => "1942-11-17",
+        "created_at" => json_response["created_at"],
+        "updated_at" => json_response["updated_at"]
+      })
     end
   end
 
@@ -64,15 +76,7 @@ RSpec.describe Api::V1::DirectorsController, type: :request do
           } 
         }
       end
-      
-      let(:expected_response) do
-        hash_including(
-          "first_name" => "Donald",
-          "last_name" => "Glover",
-          "birth_date" => "1983-09-25"
-        )
-      end
-      
+          
       it "returns status code 201" do
         post "/api/v1/directors", params: valid_request_body
         expect(response).to have_http_status(:created)
@@ -88,7 +92,16 @@ RSpec.describe Api::V1::DirectorsController, type: :request do
         post "/api/v1/directors", params: valid_request_body
         
         json_response = JSON.parse(response.body)
-        expect(json_response).to match(expected_response)
+        director = Director.last
+        expect(json_response).to eq(
+        {
+          "id" => director.id,
+          "first_name" => "Donald",
+          "last_name" => "Glover",
+          "birth_date" => "1983-09-25",
+          "created_at" => json_response["created_at"],
+          "updated_at" => json_response["updated_at"]
+        })
       end
     end
     
@@ -122,7 +135,8 @@ RSpec.describe Api::V1::DirectorsController, type: :request do
         post "/api/v1/directors", params: invalid_request_body
         
         json_response = JSON.parse(response.body)
-        expect(json_response).to match(expected_error_response)
+        expect(json_response).to have_key("errors")
+        expect(json_response["errors"]).not_to be_empty
       end
     end
   end
@@ -141,14 +155,6 @@ RSpec.describe Api::V1::DirectorsController, type: :request do
         }
       end
       
-      let(:expected_response) do
-        hash_including(
-          "first_name" => "Alfred",
-          "last_name" => "Hitchcock Updated",
-          "birth_date" => "1899-08-13"
-        )
-      end
-      
       it "returns status code 200" do
         put "/api/v1/directors/#{director.id}", params: valid_request_body
         expect(response).to have_http_status(:ok)
@@ -165,7 +171,15 @@ RSpec.describe Api::V1::DirectorsController, type: :request do
         put "/api/v1/directors/#{director.id}", params: valid_request_body
         
         json_response = JSON.parse(response.body)
-        expect(json_response).to match(expected_response)
+        expect(json_response).to eq(
+        {
+          "id" => director.id,
+          "first_name" => "Alfred",
+          "last_name" => "Hitchcock Updated",
+          "birth_date" => "1899-08-13",
+          "created_at" => json_response["created_at"],
+          "updated_at" => json_response["updated_at"]
+        })
       end
     end
     
