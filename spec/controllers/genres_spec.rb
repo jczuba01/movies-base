@@ -1,53 +1,53 @@
 require 'rails_helper'
 
-RSpec.describe GenresController, type: :request do
+RSpec.describe GenresController, type: :controller do
   let(:user) { create(:user) }
 
   before do
-    sign_in user, scope: :user
+    sign_in user
   end
 
-  describe "GET /genres" do
+  describe "GET #index" do
     it "returns a success response" do
       create(:genre)
-      get genres_path
+      get :index
       expect(response).to be_successful
     end
   end
 
-  describe "GET /genres/:id" do
+  describe "GET #show" do
     it "returns a success response" do
       genre = create(:genre)
-      get genre_path(genre)
+      get :show, params: { id: genre.id }
       expect(response).to be_successful
     end
   end
 
-  describe "GET /genres/new" do
+  describe "GET #new" do
     it "returns a success response" do
-      get new_genre_path
+      get :new
       expect(response).to be_successful
     end
   end
 
-  describe "GET /genres/:id/edit" do
+  describe "GET #edit" do
     it "returns a success response" do
       genre = create(:genre)
-      get edit_genre_path(genre)
+      get :edit, params: { id: genre.id }
       expect(response).to be_successful
     end
   end
 
-  describe "POST /genres" do
+  describe "POST #create" do
     context "with valid params" do
       it "creates a new Genre" do
         expect {
-          post genres_path, params: { genre: attributes_for(:genre) }
+          post :create, params: { genre: attributes_for(:genre) }
         }.to change(Genre, :count).by(1)
       end
 
       it "redirects to the created genre" do
-        post genres_path, params: { genre: attributes_for(:genre) }
+        post :create, params: { genre: attributes_for(:genre) }
         expect(response).to redirect_to(genre_path(Genre.last))
       end
     end
@@ -55,30 +55,30 @@ RSpec.describe GenresController, type: :request do
     context "with invalid params" do
       it "does not create a new Genre" do
         expect {
-          post genres_path, params: { genre: attributes_for(:genre, name: nil) }
+          post :create, params: { genre: attributes_for(:genre, name: nil) }
         }.to change(Genre, :count).by(0)
       end
 
       it "returns a unprocessable entity response" do
-        post genres_path, params: { genre: attributes_for(:genre, name: nil) }
+        post :create, params: { genre: attributes_for(:genre, name: nil) }
         expect(response).to have_http_status(:unprocessable_entity)
       end
     end
   end
 
-  describe "PATCH/PUT /genres/:id" do
+  describe "PATCH #update" do
     context "with valid params" do
       it "updates the requested genre" do
         genre = create(:genre)
         new_attributes = attributes_for(:genre)
-        patch genre_path(genre), params: { genre: new_attributes }
+        patch :update, params: { id: genre.id, genre: new_attributes }
         genre.reload
         expect(genre.name).to eq(new_attributes[:name])
       end
 
       it "redirects to the genre" do
         genre = create(:genre)
-        patch genre_path(genre), params: { genre: attributes_for(:genre) }
+        patch :update, params: { id: genre.id, genre: attributes_for(:genre) }
         expect(response).to redirect_to(genre_path(genre))
       end
     end
@@ -86,23 +86,23 @@ RSpec.describe GenresController, type: :request do
     context "with invalid params" do
       it "returns a unprocessable entity response" do
         genre = create(:genre)
-        patch genre_path(genre), params: { genre: attributes_for(:genre, name: nil) }
+        patch :update, params: { id: genre.id, genre: attributes_for(:genre, name: nil) }
         expect(response).to have_http_status(:unprocessable_entity)
       end
     end
   end
 
-  describe "DELETE /genres/:id" do
+  describe "DELETE #destroy" do
     it "destroys the requested genre" do
       genre = create(:genre)
       expect {
-        delete genre_path(genre)
+        delete :destroy, params: { id: genre.id }
       }.to change(Genre, :count).by(-1)
     end
 
     it "redirects to the genres list" do
       genre = create(:genre)
-      delete genre_path(genre)
+      delete :destroy, params: { id: genre.id }
       expect(response).to redirect_to(genres_path)
     end
   end

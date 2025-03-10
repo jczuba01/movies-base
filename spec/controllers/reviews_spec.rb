@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ReviewsController, type: :request do
+RSpec.describe ReviewsController, type: :controller do
   let(:user) { create(:user) }
   let(:genre) { create(:genre) }
   let(:director) { create(:director) }
@@ -13,49 +13,50 @@ RSpec.describe ReviewsController, type: :request do
   }
 
   before do
-    sign_in user, scope: :user
+    sign_in user
   end
   
-  describe "POST /movies/:movie_id/reviews" do
+  describe "POST #create" do
     context "with valid params" do
       it "creates a new Review" do
         expect {
-          post movie_reviews_path(movie), params: { review: valid_attributes }
+          post :create, params: { movie_id: movie.id, review: valid_attributes }
         }.to change(Review, :count).by(1)
       end
 
       it "assigns the current user to the review" do
-        post movie_reviews_path(movie), params: { review: valid_attributes }
+        post :create, params: { movie_id: movie.id, review: valid_attributes }
         expect(Review.last.user).to eq(user)
       end
 
       it "redirects to the movie page with a success notice" do
-        post movie_reviews_path(movie), params: { review: valid_attributes }
+        post :create, params: { movie_id: movie.id, review: valid_attributes }
         expect(response).to redirect_to(movie_path(movie))
         expect(flash[:notice]).to eq("Review was successfully created.")
       end
 
       it "creates a new review successfully" do
-        post movie_reviews_path(movie), params: { review: valid_attributes }
+        post :create, params: { movie_id: movie.id, review: valid_attributes }
         expect(response).to have_http_status(:found)
+      end
     end
 
     context "with invalid params" do
       it "does not create a new Review" do
         expect {
-          post movie_reviews_path(movie), params: { review: invalid_attributes }
+          post :create, params: { movie_id: movie.id, review: invalid_attributes }
         }.to change(Review, :count).by(0)
       end
 
       it "redirects to the movie page with an error alert" do
-        post movie_reviews_path(movie), params: { review: invalid_attributes }
+        post :create, params: { movie_id: movie.id, review: invalid_attributes }
         expect(response).to redirect_to(movie_path(movie))
         expect(flash[:alert]).to eq("Error creating review.")
       end
     end
   end
 
-  describe "PATCH/PUT /movies/:movie_id/reviews/:id" do
+  describe "PATCH #update" do
     let(:review) { create(:review, user: user, movie: movie) }
 
     context "with valid params" do
@@ -64,50 +65,50 @@ RSpec.describe ReviewsController, type: :request do
       }
 
       it "updates the requested review" do
-        patch movie_review_path(movie, review), params: { review: new_attributes }
+        patch :update, params: { movie_id: movie.id, id: review.id, review: new_attributes }
         review.reload
         expect(review.rating).to eq(5)
         expect(review.comment).to eq("Updated comment")
       end
 
       it "redirects to the movie page with a success notice" do
-        patch movie_review_path(movie, review), params: { review: valid_attributes }
+        patch :update, params: { movie_id: movie.id, id: review.id, review: valid_attributes }
         expect(response).to redirect_to(movie_path(movie))
         expect(flash[:notice]).to eq("Review was successfully updated.")
       end
 
       it "updates the review successfully" do
-        patch movie_review_path(movie, review), params: { review: valid_attributes }
+        patch :update, params: { movie_id: movie.id, id: review.id, review: valid_attributes }
         expect(response).to have_http_status(:found)
       end
     end
 
     context "with invalid params" do
       it "redirects to the movie page with an error alert" do
-        patch movie_review_path(movie, review), params: { review: invalid_attributes }
+        patch :update, params: { movie_id: movie.id, id: review.id, review: invalid_attributes }
         expect(response).to redirect_to(movie_path(movie))
         expect(flash[:alert]).to eq("Error updating review.")
       end
     end
   end
 
-  describe "DELETE /movies/:movie_id/reviews/:id" do
+  describe "DELETE #destroy" do
     let!(:review) { create(:review, user: user, movie: movie) }
 
     it "destroys the requested review" do
       expect {
-        delete movie_review_path(movie, review)
+        delete :destroy, params: { movie_id: movie.id, id: review.id }
       }.to change(Review, :count).by(-1)
     end
 
     it "redirects to the movie page with a success notice" do
-      delete movie_review_path(movie, review)
+      delete :destroy, params: { movie_id: movie.id, id: review.id }
       expect(response).to redirect_to(movie_path(movie))
       expect(flash[:notice]).to eq("Review was successfully deleted.")
     end
 
     it "deletes the review successfully" do
-      delete movie_review_path(movie, review)
+      delete :destroy, params: { movie_id: movie.id, id: review.id }
       expect(response).to have_http_status(:found)
     end
   end

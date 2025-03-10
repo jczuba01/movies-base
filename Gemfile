@@ -61,6 +61,7 @@ group :development, :test do
 end
   # Bindingpry
   gem "pry", "~> 0.15.0"
+  gem "pry-byebug"
 
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
@@ -76,7 +77,7 @@ group :test do
   gem "selenium-webdriver"
 end
 
-gem "devise", "~> 4.9"
+gem 'devise', github: 'heartcombo/devise', branch: 'main'
 # Sidekiq
 gem "sidekiq"
 # Image processing
