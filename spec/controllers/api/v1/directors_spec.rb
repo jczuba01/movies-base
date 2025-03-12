@@ -3,8 +3,8 @@ require 'rails_helper'
 RSpec.describe Api::V1::DirectorsController, type: :request do
   describe "GET /api/v1/directors" do
     before do
-      @martin_director = Director.create(first_name: "Martin", last_name: "Scorsese", birth_date: "1942-11-17")
-      @quentin_director = Director.create(first_name: "Quentin", last_name: "Tarantino", birth_date: "1963-03-27")
+      martin_director = Director.create(first_name: "Martin", last_name: "Scorsese", birth_date: "1942-11-17")
+      quentin_director = Director.create(first_name: "Quentin", last_name: "Tarantino", birth_date: "1963-03-27")
     end
 
     it "returns status code 200" do
@@ -20,7 +20,7 @@ RSpec.describe Api::V1::DirectorsController, type: :request do
       expect(json_response.size).to eq(2)
       expect(json_response.first).to eq(
       {  
-        "id" => @martin_director.id,
+        "id" => martin_director.id,
         "first_name" => "Martin",
         "last_name" => "Scorsese",
         "birth_date" => "1942-11-17",
@@ -29,7 +29,7 @@ RSpec.describe Api::V1::DirectorsController, type: :request do
       })
       expect(json_response.second).to eq(
       {
-        "id" => @quentin_director.id,
+        "id" => quentin_director.id,
         "first_name" => "Quentin",
         "last_name" => "Tarantino",
         "birth_date" => "1963-03-27",
@@ -41,21 +41,22 @@ RSpec.describe Api::V1::DirectorsController, type: :request do
   
   describe "GET /api/v1/directors/:id" do
     before do
-      @director = Director.create(first_name: "Martin", last_name: "Scorsese", birth_date: "1942-11-17")
+      director = Director.create(first_name: "Martin", last_name: "Scorsese", birth_date: "1942-11-17")
     end
-
+    
     it "returns status code 200" do
-      get "/api/v1/directors/#{@director.id}"
+      
+      get "/api/v1/directors/#{director.id}"
       expect(response).to have_http_status(:ok)
     end
     
     it "returns the requested director" do
-      get "/api/v1/directors/#{@director.id}"
+      get "/api/v1/directors/#{director.id}"
       
       json_response = JSON.parse(response.body)
       expect(json_response).to eq(
       {
-        "id" => @director.id,
+        "id" => director.id,
         "first_name" => "Martin",
         "last_name" => "Scorsese",
         "birth_date" => "1942-11-17",
@@ -138,8 +139,6 @@ RSpec.describe Api::V1::DirectorsController, type: :request do
   end
 
   describe "PUT /api/v1/directors/:id" do
-    let!(:director) { Director.create(first_name: "Alfred", last_name: "Hitchcock", birth_date: "1899-08-13") }
-    
     context "with valid params" do
       let(:valid_request_body) do
         { 
@@ -152,11 +151,15 @@ RSpec.describe Api::V1::DirectorsController, type: :request do
       end
       
       it "returns status code 200" do
+        director = Director.create(first_name: "Alfred", last_name: "Hitchcock", birth_date: "1899-08-13")
+        
         put "/api/v1/directors/#{director.id}", params: valid_request_body
         expect(response).to have_http_status(:ok)
       end
       
       it "updates the director" do
+        director = Director.create(first_name: "Alfred", last_name: "Hitchcock", birth_date: "1899-08-13")
+        
         put "/api/v1/directors/#{director.id}", params: valid_request_body
         
         director.reload
@@ -164,6 +167,8 @@ RSpec.describe Api::V1::DirectorsController, type: :request do
       end
       
       it "returns the updated director" do
+        director = Director.create(first_name: "Alfred", last_name: "Hitchcock", birth_date: "1899-08-13")
+        
         put "/api/v1/directors/#{director.id}", params: valid_request_body
         
         json_response = JSON.parse(response.body)
@@ -195,11 +200,15 @@ RSpec.describe Api::V1::DirectorsController, type: :request do
       end
       
       it "returns status code 422" do
+        director = Director.create(first_name: "Alfred", last_name: "Hitchcock", birth_date: "1899-08-13")
+        
         put "/api/v1/directors/#{director.id}", params: invalid_request_body
         expect(response).to have_http_status(:unprocessable_entity)
       end
       
       it "does not update the director" do
+        director = Director.create(first_name: "Alfred", last_name: "Hitchcock", birth_date: "1899-08-13")
+        
         put "/api/v1/directors/#{director.id}", params: invalid_request_body
         
         director.reload
@@ -207,6 +216,8 @@ RSpec.describe Api::V1::DirectorsController, type: :request do
       end
       
       it "returns error messages" do
+        director = Director.create(first_name: "Alfred", last_name: "Hitchcock", birth_date: "1899-08-13")
+        
         put "/api/v1/directors/#{director.id}", params: invalid_request_body
         
         json_response = JSON.parse(response.body)
@@ -216,14 +227,16 @@ RSpec.describe Api::V1::DirectorsController, type: :request do
   end
 
   describe "DELETE /api/v1/directors/:id" do
-    let!(:director) { Director.create(first_name: "Francis Ford", last_name: "Coppola", birth_date: "1939-04-07") }
-    
     it "returns status code 204" do
+      director = Director.create(first_name: "Francis Ford", last_name: "Coppola", birth_date: "1939-04-07")
+      
       delete "/api/v1/directors/#{director.id}"
       expect(response).to have_http_status(:no_content)
     end
     
     it "deletes the director" do
+      director = Director.create(first_name: "Francis Ford", last_name: "Coppola", birth_date: "1939-04-07")
+      
       expect {
         delete "/api/v1/directors/#{director.id}"
       }.to change(Director, :count).by(-1)
