@@ -41,10 +41,6 @@ class Api::V1::DirectorsController < ActionController::Base
     end
 
     def director_params
-        params.require(:director).permit(
-            :first_name,
-            :last_name,
-            :birth_date
-        )
+        params.require(:director).permit(:first_name, :last_name, :birth_date)
     end
 end

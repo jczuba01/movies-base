@@ -50,7 +50,18 @@ group :development, :test do
 
   # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
   gem "brakeman", require: false
+  # Rspec
+  gem "rspec-rails"
+  # Factory bot
+  gem "factory_bot_rails"
+  # Faker
+  gem "faker"
+  # Controller testing
+  gem "rails-controller-testing"
 end
+  # Bindingpry
+  gem "pry", "~> 0.15.0"
+  gem "pry-byebug"
 
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
@@ -66,7 +77,7 @@ group :test do
   gem "selenium-webdriver"
 end
 
-gem "devise", "~> 4.9"
+gem 'devise', github: 'heartcombo/devise', branch: 'main'
 # Sidekiq
 gem "sidekiq"
 # Image processing
