@@ -1,9 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Api::V1::GenresController, type: :request do
-  describe "GET /api/v1/genres" do
-    before { Genre.destroy_all }
-    
+  describe "GET /api/v1/genres" do    
     let!(:horror_genre) { Genre.create(name: "horror") }
     let!(:comedy_genre) { Genre.create(name: "comedy") }
     
@@ -171,10 +169,6 @@ RSpec.describe Api::V1::GenresController, type: :request do
         }
       end
 
-      let(:expected_error_response) do
-        hash_including("errors")
-      end
-
       it "returns status code 422" do
         put "/api/v1/genres/#{genre.id}", params: invalid_request_body
         expect(response).to have_http_status(:unprocessable_entity)
@@ -191,7 +185,8 @@ RSpec.describe Api::V1::GenresController, type: :request do
         put "/api/v1/genres/#{genre.id}", params: invalid_request_body
 
         json_response = JSON.parse(response.body)
-        expect(json_response).to match(expected_error_response)
+        expect(json_response).to have_key("errors")
+        expect(json_response["errors"]).not_to be_empty
       end
     end
   end

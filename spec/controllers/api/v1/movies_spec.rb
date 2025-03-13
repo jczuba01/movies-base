@@ -142,9 +142,7 @@ RSpec.describe Api::V1::MoviesController, type: :request do
           }
         }
       end
-
-      let(:expected_error_response) { hash_including("errors") }
-
+      
       it "returns status code 422" do
         post "/api/v1/movies", params: invalid_request_body
         expect(response).to have_http_status(:unprocessable_entity)
@@ -160,7 +158,8 @@ RSpec.describe Api::V1::MoviesController, type: :request do
         post "/api/v1/movies", params: invalid_request_body
         
         json_response = JSON.parse(response.body)
-        expect(json_response).to match(expected_error_response)
+        expect(json_response).to have_key("errors")
+        expect(json_response["errors"]).not_to be_empty
       end
     end
   end
@@ -227,9 +226,7 @@ RSpec.describe Api::V1::MoviesController, type: :request do
           }
         }
       end
-      
-      let(:expected_error_response) { hash_including("errors") }
-      
+          
       it "returns status code 422" do
         put "/api/v1/movies/#{movie.id}", params: invalid_request_body
         expect(response).to have_http_status(:unprocessable_entity)
@@ -246,7 +243,8 @@ RSpec.describe Api::V1::MoviesController, type: :request do
         put "/api/v1/movies/#{movie.id}", params: invalid_request_body
         
         json_response = JSON.parse(response.body)
-        expect(json_response).to match(expected_error_response)
+        expect(json_response).to have_key("errors")
+        expect(json_response["errors"]).not_to be_empty
       end
     end
   end

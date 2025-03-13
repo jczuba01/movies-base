@@ -1,131 +1,249 @@
 require 'rails_helper'
 
-RSpec.describe "Api::V1::Reviews", type: :request do
-  let(:user) { create(:user) }
-  let(:genre) { create(:genre) }
-  let(:director) { create(:director) }
-  let(:movie) { create(:movie, genre: genre, director: director) }
-
-  let(:valid_attributes) {
-    attributes_for(:review).merge(user_id: user.id)
-  }
-
-  let(:invalid_attributes) {
-    attributes_for(:review, rating: nil, comment: nil).merge(user_id: user.id)
-  }
-
-  let(:headers) { { "ACCEPT" => "application/json" } }
-
+RSpec.describe Api::V1::ReviewsController, type: :request do
+  let!(:user) { User.create(email: "user@example.com", password: "password") }
+  let!(:genre) { Genre.create(name: "Action") }
+  let!(:director) { Director.create(first_name: "Martin", last_name: "Scorsese", birth_date: "1942-11-17") }
+  let!(:movie) { Movie.create(title: "Kutas", description: "psi kutas", duration_minutes: 6222, origin_country: "Uganda", genre_id: genre.id, director_id: director.id) }
+  
   describe "GET /api/v1/movies/:movie_id/reviews" do
-    it "returns a success response" do
-      review = create(:review, movie: movie, user: user)
-      get api_v1_movie_reviews_path(movie), headers: headers
-      expect(response).to be_successful
-      expect(JSON.parse(response.body)).to include(JSON.parse(review.to_json))
+    let!(:review1) { Review.create(rating: 4, comment: "Great movie", user_id: user.id, movie_id: movie.id) }
+    let!(:review2) { Review.create(rating: 5, comment: "Excellent film", user_id: user.id, movie_id: movie.id) }
+    
+    it "returns status code 200" do
+      get "/api/v1/movies/#{movie.id}/reviews"
+      expect(response).to have_http_status(:ok)
+    end
+    
+    it "returns an array of reviews" do
+      get "/api/v1/movies/#{movie.id}/reviews"
+      
+      json_response = JSON.parse(response.body)
+      expect(json_response).to be_an(Array)
+      expect(json_response.size).to eq(2)
+      expect(json_response.first).to eq(
+      {  
+        "id" => review1.id,
+        "rating" => 4,
+        "comment" => "Great movie",
+        "user_id" => user.id,
+        "movie_id" => movie.id,
+        "created_at" => json_response.first["created_at"],
+        "updated_at" => json_response.first["updated_at"]
+      })
+      expect(json_response.second).to eq(
+      {
+        "id" => review2.id,
+        "rating" => 5,
+        "comment" => "Excellent film",
+        "user_id" => user.id,
+        "movie_id" => movie.id,
+        "created_at" => json_response.second["created_at"],
+        "updated_at" => json_response.second["updated_at"]
+      })
     end
   end
-
+  
   describe "GET /api/v1/movies/:movie_id/reviews/:id" do
-    it "returns a success response" do
-      review = create(:review, movie: movie, user: user)
-      get api_v1_movie_review_path(movie, review), headers: headers
-      expect(response).to be_successful
-      expect(JSON.parse(response.body)).to eq(JSON.parse(review.to_json))
+    let!(:review) { Review.create(rating: 4, comment: "Great movie", user_id: user.id, movie_id: movie.id) }
+    
+    it "returns status code 200" do
+      get "/api/v1/movies/#{movie.id}/reviews/#{review.id}"
+      expect(response).to have_http_status(:ok)
+    end
+    
+    it "returns the requested review" do
+      get "/api/v1/movies/#{movie.id}/reviews/#{review.id}"
+      
+      json_response = JSON.parse(response.body)
+      expect(json_response).to eq(
+      {
+        "id" => review.id,
+        "rating" => 4,
+        "comment" => "Great movie",
+        "user_id" => user.id,
+        "movie_id" => movie.id,
+        "created_at" => json_response["created_at"],
+        "updated_at" => json_response["updated_at"]
+      })
     end
   end
 
   describe "POST /api/v1/movies/:movie_id/reviews" do
-    context "with valid params" do
-      it "creates a new Review" do
+    before do
+      allow(UpdateMovieRatingJob).to receive(:perform_async).and_return(true)
+    end
+    
+    context "with valid params" do      
+      let(:valid_request_body) do
+        { 
+          review: {
+            rating: 4, 
+            comment: "Great movie", 
+            user_id: user.id
+          }
+        }
+      end
+          
+      it "returns status code 201" do        
+        post "/api/v1/movies/#{movie.id}/reviews", params: valid_request_body
+        expect(response).to have_http_status(:created)
+      end
+      
+      it "creates a new review" do        
         expect {
-          post api_v1_movie_reviews_path(movie), params: { review: valid_attributes }, headers: headers
+          post "/api/v1/movies/#{movie.id}/reviews", params: valid_request_body
         }.to change(Review, :count).by(1)
       end
-
-      it "renders a JSON response with the new review" do
-        allow(UpdateMovieRatingJob).to receive(:perform_async).and_return(true)
-
-        post api_v1_movie_reviews_path(movie), params: { review: valid_attributes }, headers: headers
-        expect(response).to have_http_status(:created)
-        expect(response.content_type).to include('application/json')
-
-        response_body = JSON.parse(response.body)
-
-        expect(UpdateMovieRatingJob).to have_received(:perform_async).with(movie.id)
-
-        expect(response_body["rating"]).to eq(valid_attributes[:rating])
-        expect(response_body["comment"]).to eq(valid_attributes[:comment])
-        expect(response_body["user_id"]).to eq(user.id)
-        expect(response_body["movie_id"]).to eq(movie.id)
+      
+      it "returns the created review" do       
+        post "/api/v1/movies/#{movie.id}/reviews", params: valid_request_body
+        
+        json_response = JSON.parse(response.body)
+        review = Review.last
+        expect(json_response).to eq(
+        {
+          "id" => review.id,
+          "rating" => 4,
+          "comment" => "Great movie",
+          "user_id" => user.id,
+          "movie_id" => movie.id,
+          "created_at" => json_response["created_at"],
+          "updated_at" => json_response["updated_at"]
+        })
       end
     end
-
+          
     context "with invalid params" do
-      it "renders a JSON response with errors for the new review" do
-        post api_v1_movie_reviews_path(movie), params: { review: invalid_attributes }, headers: headers
+      let(:invalid_request_body) do
+        { 
+          review: {
+            rating: nil, 
+            comment: nil, 
+            user_id: user.id
+          }
+        }
+      end
+            
+      it "returns status code 422" do
+        post "/api/v1/movies/#{movie.id}/reviews", params: invalid_request_body
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(response.content_type).to include('application/json')
+      end
+      
+      it "does not create a new review" do
+        expect {
+          post "/api/v1/movies/#{movie.id}/reviews", params: invalid_request_body
+        }.not_to change(Review, :count)
+      end
+      
+      it "returns error messages" do
+        post "/api/v1/movies/#{movie.id}/reviews", params: invalid_request_body
+        
+        json_response = JSON.parse(response.body)
+        expect(json_response).to have_key("errors")
+        expect(json_response["errors"]).not_to be_empty
       end
     end
   end
 
   describe "PUT /api/v1/movies/:movie_id/reviews/:id" do
+    let!(:review) { Review.create(rating: 3, comment: "Decent movie", user_id: user.id, movie_id: movie.id) }
+    
+    before do
+      allow(UpdateMovieRatingJob).to receive(:perform_async).and_return(true)
+    end
+    
     context "with valid params" do
-      let(:new_attributes) {
-        attributes_for(:review)
-      }
-
-      it "updates the requested review" do
-        allow(UpdateMovieRatingJob).to receive(:perform_async).and_return(true)
-
-        review = create(:review, movie: movie, user: user)
-        put api_v1_movie_review_path(movie, review), params: { review: new_attributes }, headers: headers
-        review.reload
-
-        expect(review.rating).to eq(new_attributes[:rating])
-        expect(review.comment).to eq(new_attributes[:comment])
-
-        expect(UpdateMovieRatingJob).to have_received(:perform_async).with(movie.id)
+      let(:valid_request_body) do
+        { 
+          review: {
+            rating: 4, 
+            comment: "Actually, it was better than I thought", 
+            user_id: user.id
+          }
+        }
       end
-
-      it "renders a JSON response with the review" do
-        allow(UpdateMovieRatingJob).to receive(:perform_async).and_return(true)
-
-        review = create(:review, movie: movie, user: user)
-        put api_v1_movie_review_path(movie, review), params: { review: valid_attributes }, headers: headers
+      
+      it "returns status code 200" do      
+        put "/api/v1/movies/#{movie.id}/reviews/#{review.id}", params: valid_request_body
         expect(response).to have_http_status(:ok)
-        expect(response.content_type).to include('application/json')
+      end
+      
+      it "updates the review" do        
+        put "/api/v1/movies/#{movie.id}/reviews/#{review.id}", params: valid_request_body
+        
+        review.reload
+        expect(review.rating).to eq(4)
+        expect(review.comment).to eq("Actually, it was better than I thought")
+      end
+      
+      it "returns the updated review" do        
+        put "/api/v1/movies/#{movie.id}/reviews/#{review.id}", params: valid_request_body
+        
+        json_response = JSON.parse(response.body)
+        expect(json_response).to eq(
+        {
+          "id" => review.id,
+          "rating" => 4,
+          "comment" => "Actually, it was better than I thought",
+          "user_id" => user.id,
+          "movie_id" => movie.id,
+          "created_at" => json_response["created_at"],
+          "updated_at" => json_response["updated_at"]
+        })
       end
     end
-
+    
     context "with invalid params" do
-      it "renders a JSON response with errors for the review" do
-        review = create(:review, movie: movie, user: user)
-        put api_v1_movie_review_path(movie, review), params: { review: invalid_attributes }, headers: headers
+      let(:invalid_request_body) do
+        { 
+          review: { 
+            rating: nil, 
+            comment: nil, 
+            user_id: user.id
+          }
+        }
+      end
+      
+      it "returns status code 422" do
+        put "/api/v1/movies/#{movie.id}/reviews/#{review.id}", params: invalid_request_body
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(response.content_type).to include('application/json')
+      end
+      
+      it "does not update the review" do
+        put "/api/v1/movies/#{movie.id}/reviews/#{review.id}", params: invalid_request_body
+        
+        review.reload
+        expect(review.rating).to eq(3)
+        expect(review.comment).to eq("Decent movie")
+      end
+      
+      it "returns error messages" do
+        put "/api/v1/movies/#{movie.id}/reviews/#{review.id}", params: invalid_request_body
+        
+        json_response = JSON.parse(response.body)
+        expect(json_response).to have_key("errors")
+        expect(json_response["errors"]).not_to be_empty
       end
     end
   end
 
   describe "DELETE /api/v1/movies/:movie_id/reviews/:id" do
-    it "destroys the requested review" do
+    let!(:review) { Review.create(rating: 3, comment: "Decent movie", user_id: user.id, movie_id: movie.id) }
+    
+    before do
       allow(UpdateMovieRatingJob).to receive(:perform_async).and_return(true)
-
-      review = create(:review, movie: movie, user: user)
-      expect {
-        delete api_v1_movie_review_path(movie, review), headers: headers
-      }.to change(Review, :count).by(-1)
-
-      expect(UpdateMovieRatingJob).to have_received(:perform_async).with(movie.id)
     end
-
-    it "returns no content status" do
-      allow(UpdateMovieRatingJob).to receive(:perform_async).and_return(true)
-
-      review = create(:review, movie: movie, user: user)
-      delete api_v1_movie_review_path(movie, review), headers: headers
+    
+    it "returns status code 204" do
+      delete "/api/v1/movies/#{movie.id}/reviews/#{review.id}"
       expect(response).to have_http_status(:no_content)
+    end
+    
+    it "deletes the review" do      
+      expect {
+        delete "/api/v1/movies/#{movie.id}/reviews/#{review.id}"
+      }.to change(Review, :count).by(-1)
     end
   end
 end
