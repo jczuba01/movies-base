@@ -1,0 +1,46 @@
+<div class="container mt-4">
+  <% if @actor %>
+    <h1>Edit Role</h1>
+    <h2>Actor: <%= "#{@actor.first_name} #{@actor.last_name}" %></h2>
+
+    <%= form_with model: [@actor, @role], class: "mt-4" do |form| %>
+      <div class="mb-3">
+        <%= form.label :movie_id, "Movie", class: "form-label" %>
+        <%= form.collection_select :movie_id, Movie.all, :id, :title, { prompt: "Select a movie" }, class: "form-select" %>
+      </div>
+
+      <div class="mb-3">
+        <%= form.label :character_name, "Character Name", class: "form-label" %>
+        <%= form.text_field :character_name, class: "form-control" %>
+      </div>
+
+      <div class="d-flex gap-2">
+        <%= form.submit "Update Role", class: "btn btn-primary" %>
+        <%= link_to "Back to Actor", @actor, class: "btn btn-secondary" %>
+      </div>
+    <% end %>
+  <% else %>
+    <h1>Edit Role</h1>
+    <h2>Movie: <%= @movie.title %></h2>
+
+    <%= form_with model: [@movie, @role], class: "mt-4" do |form| %>
+      <div class="mb-3">
+        <%= form.label :actor_id, "Actor", class: "form-label" %>
+        <%= form.collection_select :actor_id, Actor.all.order(:last_name, :first_name), :id, 
+            ->(actor) { "#{actor.first_name} #{actor.last_name}" }, 
+            { prompt: "Select an actor" }, 
+            { class: "form-select" } %>
+      </div>
+
+      <div class="mb-3">
+        <%= form.label :character_name, "Character Name", class: "form-label" %>
+        <%= form.text_field :character_name, class: "form-control" %>
+      </div>
+
+      <div class="d-flex gap-2">
+        <%= form.submit "Update Role", class: "btn btn-primary" %>
+        <%= link_to "Back to Movie", @movie, class: "btn btn-secondary" %>
+      </div>
+    <% end %>
+  <% end %>
+</div>

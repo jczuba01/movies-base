@@ -1,0 +1,11 @@
+<div class="container mt-4">
+  <h1>Actors</h1>
+
+  <%= link_to "New Actor", new_actor_path, class: "btn btn-success mb-3" %>
+
+  <div id="actors" class="list-group">
+    <% @actors.each do |actor| %>
+      <%= link_to "#{actor.first_name} #{actor.last_name}", actor, class: "list-group-item list-group-item-action" %>
+    <% end %>
+  </div>
+</div>
