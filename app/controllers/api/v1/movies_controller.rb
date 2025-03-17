@@ -8,7 +8,10 @@ class Api::V1::MoviesController < ActionController::Base
           
           if @director
             @movies = @director.movies
-            render json: @movies, status: :ok
+            render json: @movies.as_json(include: {
+                genre: { only: [:id, :name] },
+                director: { only: [:id, :first_name, :last_name] }
+            }), status: :ok
           else
             render json: { error: "Director not found" }, status: :not_found
           end
@@ -17,13 +20,19 @@ class Api::V1::MoviesController < ActionController::Base
           
           if @genre
             @movies = @genre.movies
-            render json: @movies, status: :ok
+            render json: @movies.as_json(include: {
+                genre: { only: [:id, :name] },
+                director: { only: [:id, :first_name, :last_name] }
+            }), status: :ok
           else
             render json: { error: "Genre not found" }, status: :not_found
           end
         else
           @movies = Movie.all
-          render json: @movies, status: :ok
+          render json: @movies.as_json(include: {
+            genre: { only: [:id, :name] },
+            director: { only: [:id, :first_name, :last_name] }
+          }), status: :ok
         end
     end
 
