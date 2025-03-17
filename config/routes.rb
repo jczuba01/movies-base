@@ -10,8 +10,12 @@ Rails.application.routes.draw do
   resources :actors do
     resources :roles
   end
-  resources :directors
-  resources :genres
+  resources :directors do
+    resources :movies, only: [:index]
+  end
+  resources :genres do
+    resources :movies, only: [:index]
+  end
   resources :movies do
     resources :reviews, only: [ :create, :update, :destroy ]
     resources :roles, only: [ :new, :create, :edit, :update, :destroy ]
@@ -23,8 +27,13 @@ Rails.application.routes.draw do
           resources :reviews
           resources :roles
         end
-        resources :directors
-        resources :genres
+        resources :directors do
+          resources :movies, only: [:index]
+        end
+        resources :genres do
+          resources :movies, only: [:index]
+        end
+        resources :actors
     end
   end
 

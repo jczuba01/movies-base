@@ -2,7 +2,29 @@ class MoviesController < ApplicationController
     before_action :set_movie, only: %i[ show edit update destroy ]
 
     def index
-      @movies = Movie.all
+      if params[:director_id]
+        @director = Director.find_by(id: params[:director_id])
+        
+        if @director
+          @movies = @director.movies
+        else
+          flash[:alert] = "Director not found"
+          redirect_to directors_path
+          return
+        end
+      elsif params[:genre_id]
+        @genre = Genre.find_by(id: params[:genre_id])
+
+        if @genre
+          @movies = @genre.movies
+        else
+          flash[:alert] = "Genre not found"
+          redirect_to genres_path
+          return
+        end
+      else
+        @movies = Movie.all
+      end
     end
 
     def show
