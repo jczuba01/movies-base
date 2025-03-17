@@ -16,6 +16,7 @@ Rails.application.routes.draw do
   resources :genres do
     resources :movies, only: [:index]
   end
+  get 'fetch_movie_details', to: 'movies#fetch_details'
   resources :movies do
     resources :reviews, only: [ :create, :update, :destroy ]
     resources :roles, only: [ :new, :create, :edit, :update, :destroy ]

@@ -1,4 +1,26 @@
-<%= form_with model: movie, html: { class: "container mt-4" } do |form| %>
+<!-- Form to search -->
+<div class="card mb-4">
+  <div class="card-header bg-light">
+    <h5 class="mb-0">Find Movie Details</h5>
+  </div>
+  <div class="card-body">
+    <%= form_with url: fetch_movie_details_path, method: :get, local: true do |search_form| %>
+      <div class="input-group">
+        <%= search_form.text_field :title, class: "form-control", placeholder: "Enter movie title" %>
+        <%= search_form.submit "Get Movie Details", class: "btn btn-info" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<% if @poster_path.present? %>
+  <div class="mb-4">
+    <img src="https://image.tmdb.org/t/p/w300<%= @poster_path %>" class="img-thumbnail" alt="Movie poster">
+  </div>
+<% end %>
+
+<!-- Main form -->
+<%= form_with model: movie do |form| %>
   <% if movie.errors.any? %>
     <div class="alert alert-danger">
       <h2><%= pluralize(movie.errors.count, "error") %> prohibited this movie from being saved:</h2>
@@ -42,7 +64,7 @@
 
   <div class="mb-3">
     <%= form.label :cover %>
-    <%= form.file_field :cover %>
+    <%= form.file_field :cover, class: "form-control" %>
   </div>
 
   <div class="mb-3">
