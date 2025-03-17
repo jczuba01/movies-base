@@ -3,8 +3,28 @@ class Api::V1::MoviesController < ActionController::Base
     before_action :set_movie, only: %i[ show update destroy ]
 
     def index
-        @movies = Movie.all
-        render json: @movies, status: :ok
+        if params[:director_id]
+          @director = Director.find_by(id: params[:director_id])
+          
+          if @director
+            @movies = @director.movies
+            render json: @movies, status: :ok
+          else
+            render json: { error: "Director not found" }, status: :not_found
+          end
+        elsif params[:genre_id]
+          @genre = Genre.find_by(id: params[:genre_id])
+          
+          if @genre
+            @movies = @genre.movies
+            render json: @movies, status: :ok
+          else
+            render json: { error: "Genre not found" }, status: :not_found
+          end
+        else
+          @movies = Movie.all
+          render json: @movies, status: :ok
+        end
     end
 
     def show
