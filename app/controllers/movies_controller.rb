@@ -92,93 +92,24 @@ class MoviesController < ApplicationController
     
     if params[:title].present?
       api_key = Rails.application.credentials.tmdb[:api_key]
+      tmdb_service = TmdbService.new(api_key)
       
-      require 'net/http'
-      require 'uri'
-      require 'json'
+      movie_attributes = tmdb_service.fetch_movie_details(params[:title])
       
-      # Step 1: Search for the movie by title
-      query = URI.encode_www_form_component(params[:title])
-      uri = URI.parse("https://api.themoviedb.org/3/search/movie?query=#{query}")
-      request = Net::HTTP::Get.new(uri)
-      request["Authorization"] = "Bearer #{api_key}"
-      
-      http = Net::HTTP.new(uri.hostname, uri.port)
-      http.use_ssl = true
-      
-      response = http.request(request)
-      search_results = JSON.parse(response.body)
-      
-      if search_results["results"] && search_results["results"].any?
-        # Step 2: Get the first movie ID from results
-        movie_id = search_results["results"][0]["id"]
+      if movie_attributes
+        @movie.title = movie_attributes[:title]
+        @movie.description = movie_attributes[:description]
+        @movie.duration_minutes = movie_attributes[:duration_minutes]
+        @movie.origin_country = movie_attributes[:origin_country]
+        @movie.genre_id = movie_attributes[:genre_id]
+        @movie.director_id = movie_attributes[:director_id]
         
-        # Step 3: Get detailed information about the movie
-        details_uri = URI.parse("https://api.themoviedb.org/3/movie/#{movie_id}?append_to_response=credits")
-        details_request = Net::HTTP::Get.new(details_uri)
-        details_request["Authorization"] = "Bearer #{api_key}"
-        
-        details_response = http.request(details_request)
-        movie_details = JSON.parse(details_response.body)
-        
-        # Step 4: Populate the @movie object with data from API
-        @movie.title = movie_details["title"]
-        @movie.description = movie_details["overview"]
-        @movie.duration_minutes = movie_details["runtime"]
-        
-        # Get origin country
-        if movie_details["production_countries"] && movie_details["production_countries"].any?
-          @movie.origin_country = movie_details["production_countries"][0]["iso_3166_1"]
-        end
-        
-        # Handle genre - find or create
-        if movie_details["genres"] && movie_details["genres"].any?
-          genre_name = movie_details["genres"][0]["name"]
-          genre = Genre.find_by("LOWER(name) = ?", genre_name.downcase)
-          
-          # Create genre if it doesn't exist
-          if genre.nil?
-            genre = Genre.create(name: genre_name)
-            flash.now[:notice] = flash.now[:notice].to_s + " Created new genre: #{genre_name}."
-          end
-          
-          @movie.genre_id = genre.id if genre.persisted?
-        end
-        
-        # Handle director - find or create
-        if movie_details["credits"] && movie_details["credits"]["crew"]
-          director = movie_details["credits"]["crew"].find { |crew_member| crew_member["job"] == "Director" }
-          if director
-            director_name = director["name"]
-            names = director_name.split(" ", 2)
-            first_name = names[0]
-            last_name = names[1] || ""
-            
-            # Try to find existing director
-            existing_director = Director.where("LOWER(first_name) LIKE ? AND LOWER(last_name) LIKE ?", 
-                                              "%#{first_name.downcase}%", "%#{last_name.downcase}%").first
-            
-            # Create new director if not found
-            if existing_director.nil?
-              existing_director = Director.create(
-                first_name: first_name,
-                last_name: last_name
-              )
-              flash.now[:notice] = flash.now[:notice].to_s + " Created new director: #{director_name}."
-            end
-            
-            @movie.director_id = existing_director.id if existing_director.persisted?
-          end
-        end
-        
-        # Save poster path for display in the view and for later use
-        if movie_details["poster_path"]
-          @poster_path = movie_details["poster_path"]
+        if movie_attributes[:poster_path]
+          @poster_path = movie_attributes[:poster_path]
           session[:poster_path] = @poster_path
         end
         
-        # Show success message
-        flash.now[:notice] = "Found details for: #{@movie.title}" + (flash.now[:notice].to_s.presence || "")
+        flash.now[:notice] = "Found movie: #{@movie.title}"
       else
         flash.now[:alert] = "No movies found with that title"
       end
