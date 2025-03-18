@@ -88,10 +88,11 @@ class MoviesController < ApplicationController
 
   def fetch_details
     if params[:title].present?
-      @movie = TmdbService.new(params[:title]).fetch_movie_details
+      service = TmdbService.new(params[:title])
+      @movie = service.fetch_movie_details
       
       if @movie
-        @poster_path = TmdbService.new(params[:title]).fetch_poster_path
+        @poster_path = service.fetch_poster_path
         session[:poster_path] = @poster_path if @poster_path
         flash.now[:notice] = "Found movie: #{@movie.title}"
       else
