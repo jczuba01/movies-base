@@ -29,7 +29,6 @@ class MoviesController < ApplicationController
   end
 
   def show
-    @movie = Movie.find(params[:id])
     @reviews = @movie.reviews
   end
 
@@ -88,31 +87,19 @@ class MoviesController < ApplicationController
   end
 
   def fetch_details
-    @movie = Movie.new
-    
     if params[:title].present?
-      api_key = Rails.application.credentials.tmdb[:api_key]
-      tmdb_service = TmdbService.new(api_key)
+      @movie = TmdbService.new(params[:title]).fetch_movie_details
       
-      movie_attributes = tmdb_service.fetch_movie_details(params[:title])
-      
-      if movie_attributes
-        @movie.title = movie_attributes[:title]
-        @movie.description = movie_attributes[:description]
-        @movie.duration_minutes = movie_attributes[:duration_minutes]
-        @movie.origin_country = movie_attributes[:origin_country]
-        @movie.genre_id = movie_attributes[:genre_id]
-        @movie.director_id = movie_attributes[:director_id]
-        
-        if movie_attributes[:poster_path]
-          @poster_path = movie_attributes[:poster_path]
-          session[:poster_path] = @poster_path
-        end
-        
+      if @movie
+        @poster_path = TmdbService.new(params[:title]).fetch_poster_path
+        session[:poster_path] = @poster_path if @poster_path
         flash.now[:notice] = "Found movie: #{@movie.title}"
       else
+        @movie = Movie.new
         flash.now[:alert] = "No movies found with that title"
       end
+    else
+      @movie = Movie.new
     end
     
     render :new
