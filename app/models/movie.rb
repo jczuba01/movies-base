@@ -8,4 +8,8 @@ class Movie < ApplicationRecord
 
     validates :title, presence: true
     validates :duration_minutes, presence: true
+
+    def self.ransackable_attributes(auth_object = nil)
+        ["title"]
+    end
 end

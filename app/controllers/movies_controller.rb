@@ -3,11 +3,13 @@ class MoviesController < ApplicationController
   require 'open-uri'
 
   def index
+    @q = Movie.ransack(params[:q])
+       
     if params[:director_id]
       @director = Director.find_by(id: params[:director_id])
       
       if @director
-        @movies = @director.movies
+        @movies = @q.result(distinct: true).where(director_id: @director.id)
       else
         flash[:alert] = "Director not found"
         redirect_to directors_path
@@ -17,14 +19,14 @@ class MoviesController < ApplicationController
       @genre = Genre.find_by(id: params[:genre_id])
 
       if @genre
-        @movies = @genre.movies
+        @movies = @q.result(distinct: true).where(genre_id: @genre.id)
       else
         flash[:alert] = "Genre not found"
         redirect_to genres_path
         return
       end
     else
-      @movies = Movie.all
+      @movies = @q.result(distinct: true)
     end
   end
 
