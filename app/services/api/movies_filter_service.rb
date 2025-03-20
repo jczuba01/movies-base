@@ -1,5 +1,5 @@
 module Api
-  class MoviesFilterService < Api::FilterService
+  class MoviesFilterService < Api::BaseFilterService
     private
 
     def apply_filters(result)

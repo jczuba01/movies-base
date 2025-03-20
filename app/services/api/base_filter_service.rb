@@ -1,5 +1,5 @@
 module Api
-  class FilterService
+  class BaseFilterService
     attr_reader :collection, :params
 
     def initialize(collection, params = {})
