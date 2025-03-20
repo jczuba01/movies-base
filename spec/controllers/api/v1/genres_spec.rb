@@ -1,10 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe Api::V1::GenresController, type: :request do
-  describe "GET /api/v1/genres" do    
+  describe "GET /api/v1/genres" do
     let!(:horror_genre) { Genre.create(name: "horror") }
     let!(:comedy_genre) { Genre.create(name: "comedy") }
-    
+
     it "returns status code 200" do
       get "/api/v1/genres"
       expect(response).to have_http_status(:ok)
@@ -36,7 +36,7 @@ RSpec.describe Api::V1::GenresController, type: :request do
 
   describe "GET /api/v1/genres/:id" do
     let!(:genre) { Genre.create(name: "sci-fi") }
-    
+
     it "returns status code 200" do
       get "/api/v1/genres/#{genre.id}"
       expect(response).to have_http_status(:ok)
@@ -70,7 +70,7 @@ RSpec.describe Api::V1::GenresController, type: :request do
         post "/api/v1/genres", params: valid_request_body
         expect(response).to have_http_status(:created)
       end
-      
+
       it "creates a new genre" do
         expect {
           post "/api/v1/genres", params: valid_request_body
@@ -138,10 +138,10 @@ RSpec.describe Api::V1::GenresController, type: :request do
         put "/api/v1/genres/#{genre.id}", params: valid_request_body
         expect(response).to have_http_status(:ok)
       end
-      
+
       it "updates the genre" do
         put "/api/v1/genres/#{genre.id}", params: valid_request_body
-        
+
         genre.reload
         expect(genre.name).to eq("historical updated")
       end
@@ -158,7 +158,7 @@ RSpec.describe Api::V1::GenresController, type: :request do
           "updated_at" => json_response["updated_at"]
         })
       end
-    end  
+    end
 
     context "with invalid params" do
       let(:invalid_request_body) do
@@ -176,7 +176,7 @@ RSpec.describe Api::V1::GenresController, type: :request do
 
       it "does not update the genre" do
         put "/api/v1/genres/#{genre.id}", params: invalid_request_body
-        
+
         genre.reload
         expect(genre.name).to eq("historical")
       end

@@ -9,24 +9,24 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
   get "roles/create"
   get "roles/destroy"
-  get 'fetch_movie_details', to: 'movies#fetch_details'
-  
+  get "fetch_movie_details", to: "movies#fetch_details"
+
   # Main resources
   resources :actors do
     resources :roles
   end
 
   resources :directors do
-    resources :movies, only: [:index]
+    resources :movies, only: [ :index ]
   end
-  
+
   resources :genres do
-    resources :movies, only: [:index]
+    resources :movies, only: [ :index ]
   end
-  
+
   resources :movies do
-    resources :reviews, only: [:create, :update, :destroy]
-    resources :roles, only: [:new, :create, :edit, :update, :destroy]
+    resources :reviews, only: [ :create, :update, :destroy ]
+    resources :roles, only: [ :new, :create, :edit, :update, :destroy ]
   end
 
   # API routes
@@ -36,15 +36,15 @@ Rails.application.routes.draw do
         resources :reviews
         resources :roles
       end
-      
+
       resources :directors do
-        resources :movies, only: [:index]
+        resources :movies, only: [ :index ]
       end
-      
+
       resources :genres do
-        resources :movies, only: [:index]
+        resources :movies, only: [ :index ]
       end
-      
+
       resources :actors
     end
   end

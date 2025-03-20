@@ -1,6 +1,6 @@
 class ActorsController < ApplicationController
   before_action :set_actor, only: %i[ show edit update destroy]
-  
+
   def index
     @actors = Actor.all
   end
@@ -37,10 +37,10 @@ class ActorsController < ApplicationController
     @actor.destroy
     redirect_to actors_path
   end
-  
+
   def create_role
     @role = @actor.roles.new(role_params)
-    
+
     if @role.save
       redirect_to @actor, notice: "Role was successfully created."
     else
@@ -49,11 +49,11 @@ class ActorsController < ApplicationController
     end
   end
 
-  private 
+  private
   def set_actor
     @actor = Actor.find(params[:id])
   end
-  
+
   def actor_params
     params.require(:actor).permit(:first_name, :last_name, :birth_date)
   end

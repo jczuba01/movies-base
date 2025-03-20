@@ -1,19 +1,19 @@
 class MoviesController < ApplicationController
   before_action :set_movie, only: %i[ show edit update destroy ]
-  require 'open-uri'
+  require "open-uri"
 
   def index
     @q = Movie.ransack(params[:q])
-    
+
     if params[:director_id]
       @director = Director.find_by(id: params[:director_id])
-      
+
       if @director
         @movies = @q.result.where(director_id: @director.id)
       else
         flash[:alert] = "Director not found"
         redirect_to directors_path
-        return
+        nil
       end
     elsif params[:genre_id]
       @genre = Genre.find_by(id: params[:genre_id])
@@ -23,7 +23,7 @@ class MoviesController < ApplicationController
       else
         flash[:alert] = "Genre not found"
         redirect_to genres_path
-        return
+        nil
       end
     else
       @movies = @q.result
@@ -40,18 +40,18 @@ class MoviesController < ApplicationController
 
   def create
     @movie = Movie.new(movie_params)
-    
+
     if session[:poster_path].present?
       begin
         poster_url = "https://image.tmdb.org/t/p/w500#{session[:poster_path]}"
-        @movie.cover.attach(io: URI.open(poster_url), 
-                          filename: "#{@movie.title.parameterize}.jpg", 
+        @movie.cover.attach(io: URI.open(poster_url),
+                          filename: "#{@movie.title.parameterize}.jpg",
                           content_type: "image/jpeg")
       rescue
       end
       session.delete(:poster_path)
     end
-    
+
     if @movie.save
       redirect_to @movie
     else
@@ -92,7 +92,7 @@ class MoviesController < ApplicationController
     if params[:title].present?
       service = TmdbService.new(params[:title])
       @movie = service.fetch_movie_details
-      
+
       if @movie
         @poster_path = service.fetch_poster_path
         session[:poster_path] = @poster_path if @poster_path
@@ -104,10 +104,10 @@ class MoviesController < ApplicationController
     else
       @movie = Movie.new
     end
-    
+
     render :new
   end
-  
+
   private
     def set_movie
       @movie = Movie.find(params[:id])

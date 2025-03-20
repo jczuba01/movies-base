@@ -4,10 +4,10 @@ class Genre < ApplicationRecord
     validates :name, presence: true
 
     def self.ransackable_attributes(auth_object = nil)
-        ["name"]
+        [ "name" ]
     end
 
     def self.ransackable_associations(auth_object = nil)
-        ["movies"]
+        [ "movies" ]
     end
 end
