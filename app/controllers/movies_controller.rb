@@ -4,7 +4,7 @@ class MoviesController < ApplicationController
 
   def index
     @q = Movie.ransack(params[:q])
-       
+    
     if params[:director_id]
       @director = Director.find_by(id: params[:director_id])
       

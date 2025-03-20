@@ -25,7 +25,6 @@
       <tr>
         <th>ID</th>
         <th><%= sort_link(@q, :title, "Title") %></th>
-        <th>Description</th>
         <th>Genre</th>
         <th>Duration in Minutes</th>
         <th>Director</th>
@@ -38,7 +37,6 @@
         <tr>
           <td><%= movie.id %></td>
           <td><%= link_to movie.title, movie %></td>
-          <td><%= movie.description %></td>
           <td><%= link_to movie.genre.name, movie.genre %></td> <!-- Assuming Genre relation -->
           <td><%= movie.duration_minutes %></td>
           <td><%= link_to "#{movie.director.first_name} #{movie.director.last_name}", movie.director %></td> <!-- Assuming Director relation -->
