@@ -1,18 +1,18 @@
 class TmdbService
-    require 'net/http'
-    require 'json'
-    require 'open-uri'
-  
+    require "net/http"
+    require "json"
+    require "open-uri"
+
     def initialize(title)
       @title = title
       @api_key = Rails.application.credentials.tmdb[:api_key]
       @http = Net::HTTP.new("api.themoviedb.org", 443)
       @http.use_ssl = true
     end
-  
+
     def fetch_movie_details
       return nil if @title.blank?
-      
+
       movie_data = search_and_fetch_movie
       return nil unless movie_data
 
@@ -82,4 +82,4 @@ class TmdbService
 
       exsisting_director.id
     end
-  end
+end

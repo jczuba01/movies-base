@@ -15,7 +15,7 @@ RSpec.describe ReviewsController, type: :controller do
   before do
     sign_in user
   end
-  
+
   describe "POST #create" do
     context "with valid params" do
       it "creates a new Review" do

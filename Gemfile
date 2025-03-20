@@ -77,7 +77,7 @@ group :test do
   gem "selenium-webdriver"
 end
 
-gem 'devise', github: 'heartcombo/devise', branch: 'main'
+gem "devise", github: "heartcombo/devise", branch: "main"
 # Sidekiq
 gem "sidekiq"
 # Image processing
@@ -86,5 +86,5 @@ gem "image_processing", ">= 1.2"
 gem "aws-sdk-s3", require: false
 # Serializer
 gem "active_model_serializers"
-#Ransack
-gem 'ransack'
+# Ransack
+gem "ransack"
