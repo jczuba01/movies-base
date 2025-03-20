@@ -9,7 +9,7 @@ class MoviesController < ApplicationController
       @director = Director.find_by(id: params[:director_id])
       
       if @director
-        @movies = @q.result(distinct: true).where(director_id: @director.id)
+        @movies = @q.result.where(director_id: @director.id)
       else
         flash[:alert] = "Director not found"
         redirect_to directors_path
@@ -19,14 +19,14 @@ class MoviesController < ApplicationController
       @genre = Genre.find_by(id: params[:genre_id])
 
       if @genre
-        @movies = @q.result(distinct: true).where(genre_id: @genre.id)
+        @movies = @q.result.where(genre_id: @genre.id)
       else
         flash[:alert] = "Genre not found"
         redirect_to genres_path
         return
       end
     else
-      @movies = @q.result(distinct: true)
+      @movies = @q.result
     end
   end
 
