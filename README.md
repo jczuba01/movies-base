@@ -2,6 +2,8 @@
 
 A full-featured movie library application built with Ruby on Rails 8. This is my personal project, developed following Ruby on Rails documentation and best practices.
 
+**Live Demo:** [https://movies-base-1roi.onrender.com](https://movies-base-1roi.onrender.com)
+
 ## Screenshots
 
 ### Dashboard
